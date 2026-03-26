@@ -1,7 +1,7 @@
 services:
   redis:
     networks:
-      - parkomat-net
+      - velo-net
     image: redis:7-alpine
     restart: always
     volumes:
@@ -19,7 +19,7 @@ services:
     expose:
       - "8000"
     networks:
-      - parkomat-net
+      - velo-net
     volumes:
       - api_data:/app/static
     depends_on:
@@ -55,5 +55,5 @@ volumes:
   redis_data:
 
 networks:
-  parkomat-net:
+  velo-net:
     driver: bridge

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.utils.redis import is_reminder_sent, mark_reminder_sent
 from app.utils.telegram import send_telegram_msg
-from models.models import Car, ParkingLocation, ParkingSession, ParkingSessionStatus
+from models.models import Car
 
 
 async def schedule_reminders(user_chat_id: str, end_time: datetime, session_id: str):

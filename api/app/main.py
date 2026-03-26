@@ -19,20 +19,12 @@ from app.utils.telegram import send_telegram_msg
 from models.models import (
     Car,
     OTPActivationModel,
-    ParkingLocation,
-    ParkingSession,
-    ParkingSessionStatus,
     PasswordResetToken,
     User,
-    UserParkingLocation,
 )
 
 if not os.path.exists("static/cars"):
     os.makedirs("static/cars")
-
-if not os.path.exists("static/sessions"):
-    os.makedirs("static/sessions")
-
 
 def init_sentry() -> None:
     if not config.SENTRY_DSN:
@@ -58,25 +50,8 @@ async def lifespan(app: FastAPI):
             OTPActivationModel,
             PasswordResetToken,
             Car,
-            ParkingLocation,
-            UserParkingLocation,
-            ParkingSession,
         ],
     )
-
-    active_sessions = await ParkingSession.find(
-        ParkingSession.status == ParkingSessionStatus.ACTIVE
-    ).to_list()
-
-    for session in active_sessions:
-        user = await User.get(session.user_id)
-        if user and user.telegram_chat_id:
-            asyncio.create_task(
-                schedule_reminders(
-                    user.telegram_chat_id, session.end_time, str(session.id)
-                )
-            )
-            print(f"🚀 Recovered reminder task for session: {session.id}")
 
     yield
 

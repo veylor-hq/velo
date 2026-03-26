@@ -44,7 +44,7 @@ async def send_verification_email(email: str, activation_token: str):
     # TODO: Use proper email template
     await send_email(
         email,
-        "Activation of Parkomat account",
+        "Activation of Velo account",
         f"""
 Please verify your email address
 
@@ -52,10 +52,10 @@ Click the link below to verify your email address
 {activation_token}
 
 
-If you didn't sign up for Parkomat, you can ignore this email.
+If you didn't sign up for Velo, you can ignore this email.
 
 Kind Regards,
-Ihor Savenko | Parkomat Security System
+Ihor Savenko | Velo Security System
         """,
     )
 
@@ -63,7 +63,7 @@ Ihor Savenko | Parkomat Security System
 async def send_password_reset_email(email: str, reset_link: str):
     await send_email(
         email,
-        "Reset your Parkomat password",
+        "Reset your Velo password",
         f"""
 We received a request to reset your password.
 
@@ -73,7 +73,7 @@ Click the link below to set a new password:
 If you didn't request this, you can ignore this email.
 
 Kind Regards,
-Ihor Savenko | Parkomat Security System
+Ihor Savenko | Velo Security System
         """,
     )
 
@@ -81,15 +81,15 @@ Ihor Savenko | Parkomat Security System
 async def send_signin_alert_email(email: str):
     await send_email(
         email,
-        "New sign-in to your Parkomat account",
+        "New sign-in to your Velo account",
         f"""
-We detected a new sign-in to your Parkomat account.
+We detected a new sign-in to your Velo account.
 
 If this was you, no action is needed.
 If this wasn't you, please reset your password.
 
 Kind Regards,
-Ihor Savenko | Parkomat Security System
+Ihor Savenko | Velo Security System
         """,
     )
 
@@ -97,14 +97,14 @@ Ihor Savenko | Parkomat Security System
 async def send_password_reset_confirmation(email: str):
     await send_email(
         email,
-        "Your Parkomat password was reset",
+        "Your Velo password was reset",
         f"""
-Your Parkomat password has been reset successfully.
+Your Velo password has been reset successfully.
 
 If you didn't do this, please reset your password again immediately.
 
 Kind Regards,
-Ihor Savenko | Parkomat Security System
+Ihor Savenko | Velo Security System
         """,
     )
 

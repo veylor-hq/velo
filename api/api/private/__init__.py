@@ -4,8 +4,6 @@ import os
 from fastapi import APIRouter, Depends
 
 from api.private.car import car_router
-from api.private.parking_location import parking_router
-from api.private.parking_session import session_router
 from app.core.jwt import FastJWT
 
 private_router = APIRouter(prefix="/private")
@@ -17,9 +15,6 @@ async def root():
 
 
 private_router.include_router(car_router)
-private_router.include_router(parking_router)
-private_router.include_router(session_router)
-
 
 @private_router.post("/telegram/request-code")
 async def get_connection_code(user=Depends(FastJWT().login_required)):
