@@ -1,10 +1,9 @@
 [project]
 name = "velo-api"
+license = "MIT"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "Ihor Savenko",email = "csigorek@gmail.com"}
-]
+description = "Manage your car in easy way!"
+authors = [{ name = "Ihor Savenko", email = "csigorek@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
@@ -23,7 +22,7 @@ dependencies = [
     "python-multipart (>=0.0.22,<0.0.23)",
     "httpx (>=0.28.1,<0.29.0)",
     "flagsmith (>=5.1.1,<6.0.0)",
-    "redis (>=7.1.0,<8.0.0)"
+    "redis (>=7.1.0,<8.0.0)",
 ]
 
 [tool.poetry]
