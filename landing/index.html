@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VELO // AUTOMOTIVE INTELLIGENCE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #050505;
+        color: #e0e0e0;
+        font-family: "JetBrains Mono", monospace;
+        text-transform: uppercase;
+        line-height: 1.5;
+        padding: 1.5rem;
+      }
+      @media (min-width: 768px) {
+        body {
+          padding: 3rem;
+        }
+      }
+      .border-base {
+        border: 1px solid #1a1a1a;
+      }
+      .text-amber {
+        color: #ffb800;
+      }
+      .status-green {
+        color: #00ff41;
+      }
+      .bg-amber-dim {
+        background-color: rgba(255, 184, 0, 0.02);
+      }
+
+      .scanline {
+        width: 100%;
+        height: 2px;
+        background: rgba(255, 184, 0, 0.04);
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        animation: scan 8s linear infinite;
+        z-index: 100;
+      }
+      @keyframes scan {
+        0% {
+          top: 0;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      .btn-tactical:hover {
+        background-color: #000;
+        color: #ffb800;
+        box-shadow: 0 0 15px rgba(255, 184, 0, 0.3);
+        border: 1px solid #ffb800;
+      }
+      .max-w-custom {
+        max-width: 85rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .feature-card:hover {
+        border-color: rgba(255, 184, 0, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanline"></div>
+
+    <header
+      class="max-w-custom border-b border-white/10 pb-8 mb-16 flex flex-col md:flex-row justify-between items-start md:items-end"
+    >
+      <div>
+        <h1 class="text-5xl font-bold tracking-[0.25em] text-white">VELO</h1>
+        <p class="text-[10px] mt-3 tracking-[0.6em] text-amber opacity-90">
+          AUTOMOTIVE // TELEMETRY // PERSISTENCE
+        </p>
+      </div>
+      <div
+        class="text-[10px] mt-8 md:mt-0 text-right font-bold opacity-50 space-y-1"
+      >
+        <p>PROJECT: VELO_CORE</p>
+        <p>BUILD: v0.1.0_ALPHA</p>
+        <p>REPOS: GITHUB.COM/VEYLOR-HQ</p>
+        <p class="status-green tracking-widest">[ SYSTEM_OPERATIONAL ]</p>
+      </div>
+    </header>
+
+    <main class="max-w-custom">
+      <section class="mb-24">
+        <h2 class="text-xs font-bold mb-6 text-amber tracking-widest">
+          [ 01_MISSION_DIRECTIVE ]
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div class="md:col-span-7">
+            <p class="text-lg leading-relaxed normal-case opacity-90 mb-6">
+              VELO is the sovereign standard for vehicle lifecycle tracking.
+              Designed to bridge the gap between fragile, manual maintenance
+              logs and the rapid-entry requirements of high-frequency operation.
+            </p>
+            <p class="text-sm leading-relaxed normal-case opacity-60">
+              Engineered for small, independent operators who require
+              defense-grade data integrity and situational awareness without
+              cloud-dependent overhead.
+            </p>
+          </div>
+          <div class="md:col-span-5 flex flex-col justify-center space-y-4">
+            <a
+              href="https://github.com/veylor-hq/velo"
+              class="btn-tactical block text-center bg-[#ffb800] text-black py-4 text-sm font-bold transition-all duration-200 uppercase tracking-widest border border-[#ffb800]"
+            >
+              PULL_SOURCE_CODE.SH
+            </a>
+            <div class="flex gap-4">
+              <button
+                class="border-base flex-1 py-3 text-[10px] font-bold opacity-50 cursor-not-allowed"
+              >
+                IOS_NATIVE [REDACTED]
+              </button>
+              <button
+                class="border-base flex-1 py-3 text-[10px] font-bold opacity-50 cursor-not-allowed"
+              >
+                ANDROID_APK [REDACTED]
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-24">
+        <h2 class="text-xs font-bold mb-10 text-amber tracking-widest">
+          [ 02_CORE_MODULES ]
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            class="border-base p-8 bg-white/[0.01] feature-card transition-colors"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="font-bold text-white tracking-widest">02.1_REFUEL</h3>
+              <span
+                class="text-[8px] border border-amber/30 text-amber px-2 py-0.5"
+                >ACTIVE</span
+              >
+            </div>
+            <ul
+              class="text-[11px] space-y-4 normal-case opacity-70 leading-relaxed"
+            >
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Rapid Entry:</strong
+                >
+                Optimized "at-the-pump" logging with minimal taps.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Odometer Sync:</strong
+                >
+                Automated validation of vehicle mileage delta.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Efficiency Bus:</strong
+                >
+                Real-time L/100km, MPG, and cost-per-mile calculation.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Geo-Tagging:</strong
+                >
+                Performance tracking by fuel brand and station location.
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="border-base p-8 bg-white/[0.01] feature-card transition-colors"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="font-bold text-white tracking-widest">02.2_MAINT</h3>
+              <span
+                class="text-[8px] border border-amber/30 text-amber px-2 py-0.5"
+                >ACTIVE</span
+              >
+            </div>
+            <ul
+              class="text-[11px] space-y-4 normal-case opacity-70 leading-relaxed"
+            >
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Service Logs:</strong
+                >
+                High-integrity mechanical history with high-res photo audit.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Triggers:</strong
+                >
+                Mileage and time-based preventative maintenance reminders.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Expense Hub:</strong
+                >
+                Unified tracking for insurance, road tax, and parking fees.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Parts Registry:</strong
+                >
+                Encrypted storage for SKU and part number retrieval.
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="border-base p-8 bg-amber-dim border-amber/20 feature-card transition-colors"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="font-bold text-amber tracking-widest">02.3_INTEL</h3>
+              <span class="text-[8px] bg-amber/10 text-amber px-2 py-0.5"
+                >V1_ALPHA</span
+              >
+            </div>
+            <ul
+              class="text-[11px] space-y-4 normal-case opacity-80 leading-relaxed"
+            >
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >TCO Visualizer:</strong
+                >
+                Aggregated cost-of-ownership data fusion.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Sentinel Planner:</strong
+                >
+                Predictive maintenance forecasting based on usage profile.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Telegram Bridge:</strong
+                >
+                Secure bot-link for service alerts and fiscal summaries.
+              </li>
+              <li>
+                <strong class="text-white uppercase tracking-tighter"
+                  >Peer Link:</strong
+                >
+                Multi-vehicle fleet management with permission sharing.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-24">
+        <div class="md:col-span-4 border-base p-8 bg-white/[0.02]">
+          <h2
+            class="text-[10px] font-bold mb-6 border-b border-white/10 pb-2 opacity-50"
+          >
+            ENGINEERING_SPECS
+          </h2>
+          <div class="space-y-4 text-[10px]">
+            <div class="flex justify-between">
+              <span class="opacity-40">MOBILE_STACK</span
+              ><span class="text-white">FLUTTER / DART</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="opacity-40">BACKEND_CORE</span
+              ><span class="text-white">FASTAPI / BEANIE</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="opacity-40">DATABASE</span
+              ><span class="text-white">MONGODB / REDIS</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="opacity-40">PERSISTENCE</span
+              ><span class="text-white">OFFLINE_FIRST</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="opacity-40">MIGRATION</span
+              ><span class="text-white">LUBELOGGER_COMPAT</span>
+            </div>
+          </div>
+        </div>
+        <div class="md:col-span-8 flex flex-col justify-center">
+          <h2 class="text-xs font-bold mb-6 text-amber tracking-widest">
+            [ 03_SOVEREIGN_STANDARDS ]
+          </h2>
+          <p class="text-sm leading-relaxed normal-case opacity-70 mb-4">
+            Unlike consumer-grade applications, VELO operates under the VEYLOR
+            HQ protocol: No telemetry, no third-party tracking, and full
+            operational capacity in air-gapped environments.
+          </p>
+          <p class="text-[11px] normal-case opacity-50 italic">
+            Data portability is prioritized. Export to CSV/JSON at any time for
+            manual audit or external integration.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="max-w-custom mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between text-[9px] opacity-40 tracking-[0.4em] font-bold pb-12"
+    >
+      <div>
+        <p>VEYLOR HQ // VELO // SOVEREIGN SYSTEMS</p>
+        <p class="mt-2 text-amber opacity-100">STAY_FOCUSED // DRIVE_SECURE</p>
+      </div>
+      <div class="flex flex-col md:items-end gap-2 mt-8 md:mt-0">
+        <p>AUDIT: GITHUB.COM/VEYLOR-HQ/VELO</p>
+        <p>TIMESTAMP: 2026.03.26_12:47_GMT</p>
+      </div>
+    </footer>
+  </body>
+</html>
