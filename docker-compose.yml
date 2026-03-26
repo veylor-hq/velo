@@ -14,7 +14,7 @@ services:
 
   api:
     build:
-      context: ./
+      context: ./api
     restart: unless-stopped
     expose:
       - "8000"
