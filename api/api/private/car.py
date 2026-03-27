@@ -1,53 +1,77 @@
+from datetime import datetime
 import os
 from io import BytesIO
+from typing import Optional
 
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from PIL import Image
+from pydantic import BaseModel
 
 from app.core.config import config
 from app.core.jwt import FastJWT
-from models.models import Car
+from models.models import Car, FuelUnit, OdometerUnit
 
 UPLOAD_DIR = "static/cars"
 
 car_router = APIRouter(prefix="/car")
 
 
-@car_router.post("")
+class CreateCar(BaseModel):
+    license_plate: str
+    make: Optional[str] = None
+    model: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    vin: Optional[str] = None
+    odometer_unit: OdometerUnit = OdometerUnit.KILOMETERS
+    fuel_unit: FuelUnit = FuelUnit.LITERS
+    initial_odometer: int = 0
+
+
+@car_router.post("/")
 async def create_car(
-    license_plate: str = Form(...),
+    data: str = Form(...),
     photo: UploadFile = File(...),
     user=Depends(FastJWT().login_required),
 ):
+    try:
+        car_data = CreateCar.model_validate_json(data)
+    except Exception:
+        raise HTTPException(status_code=422, detail="Invalid metadata format")
+
     existing_car = await Car.find_one(
         Car.user_id == user.id,
-        Car.license_plate == license_plate,
+        Car.license_plate == car_data.license_plate,
     )
     if existing_car:
         raise HTTPException(
             status_code=400, detail="This plate is already in your garage"
         )
 
-    car = Car(user_id=user.id, license_plate=license_plate)
+    car = Car(
+        user_id=user.id,
+        license_plate=car_data.license_plate,
+        make=car_data.make,
+        model=car_data.model,
+        year=car_data.year,
+        odometer_unit=car_data.odometer_unit,
+        fuel_unit=car_data.fuel_unit,
+        current_odometer=car_data.initial_odometer
+    )
     await car.insert()
 
-    # Filename format: user_id-car_id.jpg
     filename = f"{user.id}-{car.id}.jpg"
     file_path = os.path.join(UPLOAD_DIR, filename)
 
     try:
         content = await photo.read()
         with Image.open(BytesIO(content)) as img:
-            # Convert to RGB (required for PNG to JPG conversion)
             rgb_img = img.convert("RGB")
             rgb_img.save(file_path, "JPEG", quality=20)
     except Exception:
-        # If image processing fails, you might want to delete the DB record
         await car.delete()
         raise HTTPException(status_code=400, detail="Invalid image format")
-
-    await car.save()
 
     return {
         "id": str(car.id),
@@ -55,8 +79,7 @@ async def create_car(
         "photo_url": f"{config.API_BASE_URL}/api/static/cars/{filename}",
     }
 
-
-@car_router.get("")
+@car_router.get("/")
 async def get_cars(user=Depends(FastJWT().login_required)):
     cars = Car.find(Car.user_id == user.id)
     return {
@@ -78,8 +101,81 @@ async def get_car(car_id: PydanticObjectId, user=Depends(FastJWT().login_require
     if not car:
         raise HTTPException(status_code=404, detail="Car not found")
 
+    car_data = car.model_dump(
+        exclude={"user_id", "created_at", "updated_at", "id", "_id"}, 
+        by_alias=True
+    )
+
     return {
         "id": str(car.id),
-        "license_plate": car.license_plate,
-        "photo_filename": f"{config.API_BASE_URL}/api/static/cars/{user.id}-{car.id}.jpg",
+        "photo_url": f"{config.API_BASE_URL}/api/static/cars/{user.id}-{car.id}.jpg",
+        **car_data,
+    }
+
+class UpdateCar(BaseModel):
+    license_plate: Optional[str] = None
+    make: Optional[str] = None
+    model: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    vin: Optional[str] = None
+    odometer_unit: Optional[OdometerUnit] = None
+    fuel_unit: Optional[FuelUnit] = None
+    current_odometer: Optional[int] = None
+
+@car_router.patch("/{car_id}")
+async def update_car(
+    car_id: PydanticObjectId,
+    data: Optional[str] = Form(None),
+    photo: Optional[UploadFile] = File(None),
+    user=Depends(FastJWT().login_required)
+):
+    car = await Car.find_one(Car.id == car_id, Car.user_id == user.id)
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+
+    if data:
+        try:
+            update_data = UpdateCar.model_validate_json(data)
+            update_dict = update_data.model_dump(exclude_unset=True)
+            
+            if "license_plate" in update_dict and update_dict["license_plate"] != car.license_plate:
+                existing_car = await Car.find_one(
+                    Car.user_id == user.id,
+                    Car.license_plate == update_dict["license_plate"]
+                )
+                if existing_car:
+                    raise HTTPException(status_code=400, detail="This plate is already in your garage")
+            
+            for key, value in update_dict.items():
+                setattr(car, key, value)
+                
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(status_code=422, detail="Invalid metadata format")
+
+    if photo:
+        filename = f"{user.id}-{car.id}.jpg"
+        file_path = os.path.join(UPLOAD_DIR, filename)
+        try:
+            content = await photo.read()
+            with Image.open(BytesIO(content)) as img:
+                rgb_img = img.convert("RGB")
+                rgb_img.save(file_path, "JPEG", quality=20)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid image format")
+
+    car.updated_at = datetime.utcnow()
+    await car.save()
+
+    car_dump = car.model_dump(
+        exclude={"user_id", "created_at", "updated_at", "id", "_id"}, 
+        by_alias=True
+    )
+
+    return {
+        "id": str(car.id),
+        "photo_url": f"{config.API_BASE_URL}/api/static/cars/{user.id}-{car.id}.jpg",
+        **car_dump,
     }

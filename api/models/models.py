@@ -53,9 +53,49 @@ class PasswordResetToken(Document):
     used_at: Optional[datetime] = None
 
 
+class FuelType(str, Enum):
+    petrol = "petrol"
+    diesel = "diesel"
+    electric = "electric"
+    hybrid = "hybrid"
+    other = "other"
+    # Add more fuel types like gas?
+
+class CarSalesMeta(BaseModel):
+    price_bought: Optional[float] = None
+    price_sold: Optional[float] = None
+    date_bought: Optional[datetime] = None
+    date_sold: Optional[datetime] = None
+
+class OdometerUnit(str, Enum):
+    KILOMETERS = "km"
+    MILES = "mi"
+
+class FuelUnit(str, Enum):
+    LITERS = "l"
+    GALLONS = "gal"
+
 class Car(Document):
     user_id: PydanticObjectId
     license_plate: str
+    make: Optional[str] = None
+    model: Optional[str] = None
+    year: Optional[int] = None
+    color: Optional[str] = None
+    vin: Optional[str] = None
+    
+    odometer_unit: OdometerUnit = OdometerUnit.KILOMETERS
+    fuel_unit: FuelUnit = FuelUnit.LITERS
+    
+    current_odometer: int = 0
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Settings:
         name = "car"
+
+        model_config = {
+            "populate_by_name": True,
+            "json_encoders": {PydanticObjectId: str}
+        }
