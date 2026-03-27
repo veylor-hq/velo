@@ -117,6 +117,7 @@ class UpdateFuelRecord(BaseModel):
     notes: Optional[str] = None
     skip_mpg_calculation: Optional[bool] = None
 
+
 @fuel_router.patch("/{record_id}")
 async def update_fuel_record(
     car_id: PydanticObjectId,
@@ -158,3 +159,24 @@ async def update_fuel_record(
             raise HTTPException(status_code=400, detail="Invalid image format")
         
     return fuel_record
+
+@fuel_router.delete("/{record_id}")
+async def delete_fuel_record(
+    car_id: PydanticObjectId,
+    record_id: PydanticObjectId,
+    user=Depends(FastJWT().login_required),
+):
+    fuel_record = await FuelRecord.find_one(
+        FuelRecord.car_id == car_id,
+        FuelRecord.id == record_id,
+    )
+    if not fuel_record:
+        raise HTTPException(status_code=404, detail="Fuel record not found")
+    
+    await fuel_record.delete()
+
+    file_path = os.path.join(UPLOAD_DIR, f"{user.id}-{car_id}-{record_id}.jpg")
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    return {"detail": "Fuel record deleted"}
