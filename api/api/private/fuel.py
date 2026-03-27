@@ -76,3 +76,85 @@ async def create_fuel_record(
         await car.save()
 
     return fuel_record
+
+
+@fuel_router.get("/")
+async def get_fuel_records(
+    car_id: PydanticObjectId,
+    user=Depends(FastJWT().login_required),
+):
+    fuel_records = await FuelRecord.find(FuelRecord.car_id == car_id).to_list()
+
+    sorted_records = sorted(fuel_records, key=lambda r: r.odometer)
+    
+    result = []
+    previous_odometer = None
+    
+    for record in sorted_records:
+        record_dict = record.model_dump(exclude={"id", "_id", "car_id"}, by_alias=True)
+        
+        record_dict["id"] = str(record.id)
+        record_dict["car_id"] = str(record.car_id)
+        
+        if previous_odometer is not None:
+            record_dict["delta_mileage"] = record.odometer - previous_odometer
+        else:
+            record_dict["delta_mileage"] = 0
+            
+        previous_odometer = record.odometer
+        result.append(record_dict)
+
+    result.reverse()
+
+    return result
+
+class UpdateFuelRecord(BaseModel):
+    date: Optional[datetime] = None
+    odometer: Optional[int] = None
+    fuel_amount: Optional[float] = None
+    total_cost: Optional[float] = None
+    is_full_tank: Optional[bool] = None
+    notes: Optional[str] = None
+    skip_mpg_calculation: Optional[bool] = None
+
+@fuel_router.patch("/{record_id}")
+async def update_fuel_record(
+    car_id: PydanticObjectId,
+    record_id: PydanticObjectId,
+    data: Optional[str] = Form(None),
+    photo: Optional[UploadFile] = File(None),
+    user=Depends(FastJWT().login_required),
+):  
+    fuel_record = await FuelRecord.find_one(
+        FuelRecord.car_id == car_id,
+        FuelRecord.id == record_id,
+    )
+    if not fuel_record:
+        raise HTTPException(status_code=404, detail="Fuel record not found")
+    
+    if data:
+        try:
+            update_data = UpdateFuelRecord.model_validate_json(data)
+            update_dict = update_data.model_dump(exclude_unset=True)
+            
+            for key, value in update_dict.items():
+                setattr(fuel_record, key, value)
+            if "fuel_amount" in update_dict or "total_cost" in update_dict:
+                fuel_record.price_per_unit = fuel_record.total_cost / fuel_record.fuel_amount if fuel_record.fuel_amount > 0 else 0
+            await fuel_record.save()
+        except Exception:
+            raise HTTPException(status_code=422, detail="Invalid metadata format")
+        
+    if photo:
+        filename = f"{user.id}-{car_id}-{fuel_record.id}.jpg"
+        file_path = os.path.join(UPLOAD_DIR, filename)
+
+        try:
+            content = await photo.read()
+            with Image.open(BytesIO(content)) as img:
+                rgb_img = img.convert("RGB")
+                rgb_img.save(file_path, "JPEG", quality=20)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid image format")
+        
+    return fuel_record
