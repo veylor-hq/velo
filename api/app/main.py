@@ -21,10 +21,15 @@ from models.models import (
     OTPActivationModel,
     PasswordResetToken,
     User,
+    FuelRecord,
 )
 
 if not os.path.exists("static/cars"):
     os.makedirs("static/cars")
+
+if not os.path.exists("static/fuel_records"):
+    os.makedirs("static/fuel_records")
+
 
 def init_sentry() -> None:
     if not config.SENTRY_DSN:
@@ -50,6 +55,7 @@ async def lifespan(app: FastAPI):
             OTPActivationModel,
             PasswordResetToken,
             Car,
+            FuelRecord,
         ],
     )
 

@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from app.core.config import config
 from app.core.jwt import FastJWT
 from models.models import Car, FuelUnit, OdometerUnit
+from api.private.fuel import fuel_router
 
 UPLOAD_DIR = "static/cars"
 
@@ -179,3 +180,6 @@ async def update_car(
         "photo_url": f"{config.API_BASE_URL}/api/static/cars/{user.id}-{car.id}.jpg",
         **car_dump,
     }
+
+
+car_router.include_router(fuel_router, prefix="/{car_id}")

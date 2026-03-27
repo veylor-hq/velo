@@ -99,3 +99,27 @@ class Car(Document):
             "populate_by_name": True,
             "json_encoders": {PydanticObjectId: str}
         }
+
+class FuelRecord(Document):
+    car_id: PydanticObjectId
+    date: datetime
+    odometer: int
+    fuel_amount: float
+
+    price_per_unit: float 
+    total_cost: float
+
+    is_full_tank: bool = True
+    skip_mpg_calculation: bool = False
+    
+    notes: Optional[str] = None
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "fuel_record"
+        
+    model_config = {
+        "populate_by_name": True,
+        "json_encoders": {PydanticObjectId: str}
+    }
