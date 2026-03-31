@@ -123,3 +123,20 @@ class FuelRecord(Document):
         "populate_by_name": True,
         "json_encoders": {PydanticObjectId: str}
     }
+
+class SupplyRecord(Document):
+    user_id: PydanticObjectId
+    part_number: Optional[str] = None
+    name: str
+    quantity: int = 1
+    price_per_unit: float = 0
+    vendor: Optional[str] = None
+    notes: Optional[str] = None
+    is_tool: bool = False
+    date: Optional[datetime] = Field(default_factory=datetime.utcnow)
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "supply_record"

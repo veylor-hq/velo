@@ -20,6 +20,7 @@ from models.models import (
     Car,
     OTPActivationModel,
     PasswordResetToken,
+    SupplyRecord,
     User,
     FuelRecord,
 )
@@ -56,6 +57,7 @@ async def lifespan(app: FastAPI):
             PasswordResetToken,
             Car,
             FuelRecord,
+            SupplyRecord
         ],
     )
 

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 
 from api.private.car import car_router
 from app.core.jwt import FastJWT
+from api.private.supply import supply_router
 
 private_router = APIRouter(prefix="/private")
 
@@ -28,3 +29,5 @@ async def get_connection_code(user=Depends(FastJWT().login_required)):
     await user.save()
 
     return {"code": full_code}
+
+private_router.include_router(supply_router)
