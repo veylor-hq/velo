@@ -226,7 +226,11 @@ async def signin_event(
     if user.notification_settings and user.notification_settings.email_on_signin:
         background_tasks.add_task(send_signin_alert_email, user.email)
 
-    return {"ok": True}
+    return {
+        "ok": True,
+        "access_token": jwt_token,
+        "token_type": "bearer"
+    }
 
 
 class PasswordResetRequest(BaseModel):
