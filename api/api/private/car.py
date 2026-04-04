@@ -66,7 +66,9 @@ async def create_car(
         odometer_unit=car_data.odometer_unit,
         fuel_unit=car_data.fuel_unit,
         current_odometer=car_data.initial_odometer
-        **car_data.sales_meta.model_dump(exclude_unset=True) if car_data.sales_meta else {}
+        sales_meta= **car_data.sales_meta.model_dump() if car_data.sales_meta else None,
+        color=car_data.color,
+        vin=car_data.vin,
     )
     await car.insert()
 
