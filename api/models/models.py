@@ -140,3 +140,19 @@ class SupplyRecord(Document):
 
     class Settings:
         name = "supply_record"
+
+class OdometerRecord(Document):
+    car_id: PydanticObjectId
+    date: datetime
+    odometer: int
+    notes: Optional[str] = None
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "odometer_record"
+        
+    model_config = {
+        "populate_by_name": True,
+        "json_encoders": {PydanticObjectId: str}
+    }

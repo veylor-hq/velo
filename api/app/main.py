@@ -23,6 +23,7 @@ from models.models import (
     SupplyRecord,
     User,
     FuelRecord,
+    OdometerRecord
 )
 
 if not os.path.exists("static/cars"):
@@ -57,7 +58,8 @@ async def lifespan(app: FastAPI):
             PasswordResetToken,
             Car,
             FuelRecord,
-            SupplyRecord
+            SupplyRecord,
+            OdometerRecord
         ],
     )
 

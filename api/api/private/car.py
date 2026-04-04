@@ -12,6 +12,7 @@ from app.core.config import config
 from app.core.jwt import FastJWT
 from models.models import Car, FuelUnit, OdometerUnit
 from api.private.fuel import fuel_router
+from api.private.odometer import odometer_router
 
 UPLOAD_DIR = "static/cars"
 
@@ -183,3 +184,4 @@ async def update_car(
 
 
 car_router.include_router(fuel_router, prefix="/{car_id}")
+car_router.include_router(odometer_router, prefix="/{car_id}")
