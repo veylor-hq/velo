@@ -317,10 +317,6 @@ async def change_password(
 
 @auth_router.get("/verify")
 async def verify_event(request: Request):
-    token: dict = await FastJWT().decode(request.headers["Authorization"])
-    user = await User.get(token["id"])
-    if not user:
-        raise HTTPException(401, "Unauthorized")
     return {"status": "valid"}
 
 
@@ -331,7 +327,7 @@ async def logout_event(response: Response):
     response.delete_cookie(
         key="access_token",
         path="/",
-        domain=".ihorsavenko.com" if is_prod else None,
+        domain=".veylor.dev" if is_prod else None,
         samesite="none" if is_prod else None,
         secure=True if is_prod else False,
         httponly=True,
