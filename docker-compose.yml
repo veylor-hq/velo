@@ -22,9 +22,9 @@ services:
       - velo-net
     volumes:
       - api_data:/app/static
-    depends_on:
-      redis:
-        condition: service_healthy
+    # depends_on:
+    #   redis:
+    #     condition: service_healthy
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
       DATABASE_NAME: ${DATABASE_NAME}
