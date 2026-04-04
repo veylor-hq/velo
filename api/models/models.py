@@ -83,6 +83,8 @@ class Car(Document):
     year: Optional[int] = None
     color: Optional[str] = None
     vin: Optional[str] = None
+
+    sales_meta: Optional[CarSalesMeta] = None
     
     odometer_unit: OdometerUnit = OdometerUnit.KILOMETERS
     fuel_unit: FuelUnit = FuelUnit.LITERS

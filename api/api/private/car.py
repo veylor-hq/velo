@@ -18,6 +18,11 @@ UPLOAD_DIR = "static/cars"
 
 car_router = APIRouter(prefix="/car")
 
+class CarSalesMetaSchema(BaseModel):
+    price_bought: Optional[float] = None
+    price_sold: Optional[float] = None
+    date_bought: Optional[datetime] = None
+    date_sold: Optional[datetime] = None
 
 class CreateCar(BaseModel):
     license_plate: str
@@ -29,6 +34,7 @@ class CreateCar(BaseModel):
     odometer_unit: OdometerUnit = OdometerUnit.KILOMETERS
     fuel_unit: FuelUnit = FuelUnit.LITERS
     initial_odometer: int = 0
+    sales_meta: Optional[CarSalesMetaSchema] = None
 
 
 @car_router.post("/")
@@ -60,6 +66,7 @@ async def create_car(
         odometer_unit=car_data.odometer_unit,
         fuel_unit=car_data.fuel_unit,
         current_odometer=car_data.initial_odometer
+        **car_data.sales_meta.model_dump(exclude_unset=True) if car_data.sales_meta else {}
     )
     await car.insert()
 
@@ -124,6 +131,7 @@ class UpdateCar(BaseModel):
     odometer_unit: Optional[OdometerUnit] = None
     fuel_unit: Optional[FuelUnit] = None
     current_odometer: Optional[int] = None
+    sales_meta: Optional[CarSalesMetaSchema] = None
 
 @car_router.patch("/{car_id}")
 async def update_car(
