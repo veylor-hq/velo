@@ -8,6 +8,7 @@ import '../features/auth/presentation/sign_up_page.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/settings/presentation/settings_page.dart';
+import '../features/cars/presentation/car_dashboard_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -45,6 +46,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         builder: (BuildContext context, GoRouterState state) => const DashboardPage(),
+      ),
+      GoRoute(
+        path: '/car/:id',
+        builder: (BuildContext context, GoRouterState state) {
+          final id = state.pathParameters['id']!;
+          return CarDashboardPage(carId: id);
+        },
       ),
       GoRoute(
         path: '/settings',
