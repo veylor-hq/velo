@@ -65,7 +65,7 @@ async def create_car(
         year=car_data.year,
         odometer_unit=car_data.odometer_unit,
         fuel_unit=car_data.fuel_unit,
-        current_odometer=car_data.initial_odometer
+        current_odometer=car_data.initial_odometer,
         sales_meta= **car_data.sales_meta.model_dump() if car_data.sales_meta else None,
         color=car_data.color,
         vin=car_data.vin,
