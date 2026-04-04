@@ -8,9 +8,9 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from PIL import Image
 from pydantic import BaseModel
 
-from app.core.config import config
 from app.core.jwt import FastJWT
 from models.models import Car, FuelRecord
+from api.private.odometer import create_odometer_record, OdometerRecordCreate
 
 UPLOAD_DIR = "static/fuel_records"
 
@@ -24,6 +24,7 @@ class CreateFuelRecord(BaseModel):
     is_full_tank: bool = True
     notes: Optional[str] = None
     skip_mpg_calculation: bool = False
+    insert_odometer_record: bool = True
     
 
 @fuel_router.post("/")
@@ -75,7 +76,21 @@ async def create_fuel_record(
         car.current_odometer = fuel_data.odometer
         await car.save()
 
-    return fuel_record
+    if fuel_data.insert_odometer_record:
+        odometer_record = await create_odometer_record(
+            car_id=car_id,
+            payload=OdometerRecordCreate(
+                date=fuel_data.date,
+                odometer=fuel_data.odometer,
+                notes="Auto-generated from fuel record"
+            ),
+            user=user
+        )
+
+    return {
+        "fuel_record": fuel_record,
+        "odometer_record": odometer_record if fuel_data.insert_odometer_record else None
+    }
 
 
 @fuel_router.get("/")
