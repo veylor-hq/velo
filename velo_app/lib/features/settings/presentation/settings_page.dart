@@ -66,6 +66,25 @@ class SettingsPage extends ConsumerWidget {
           ),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('About Veylor'),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('About Veylor', style: TextStyle(fontWeight: FontWeight.bold)),
+                  content: const Text('Veylor Group\n\nAutomotive Tracking System.\nDesigned globally.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.logout, color: Colors.redAccent),
             title: const Text('Sign Out', style: TextStyle(color: Colors.redAccent)),
             onTap: () async {
