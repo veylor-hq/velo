@@ -15,7 +15,8 @@ class SettingsPage extends ConsumerWidget {
     final currency = ref.watch(currencyProvider);
     final themeMode = ref.watch(themeModeProvider);
     final hapticsEnabled = ref.watch(hapticsConfigProvider);
-    final defaultTab = ref.watch(defaultTabNotifierProvider);
+    final defaultTabAsync = ref.watch(defaultTabProvider);
+    final defaultTab = defaultTabAsync.value ?? 1;
 
     final tabNames = ['Details', 'Fuel', 'Odometer', 'Supply'];
 
@@ -66,7 +67,7 @@ class SettingsPage extends ConsumerWidget {
                     title: Text(tabNames[index]),
                     trailing: defaultTab == index ? const Icon(Icons.check) : null,
                     onTap: () {
-                      ref.read(defaultTabNotifierProvider.notifier).setTab(index);
+                      ref.read(defaultTabProvider.notifier).setTab(index);
                       Navigator.pop(ctx);
                     },
                   )),

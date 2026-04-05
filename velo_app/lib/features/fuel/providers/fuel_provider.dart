@@ -5,7 +5,7 @@ import '../service/fuel_service.dart';
 
 part 'fuel_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class FuelRecords extends _$FuelRecords {
   @override
   FutureOr<List<FuelRecord>> build(String carId) async {

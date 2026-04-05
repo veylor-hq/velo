@@ -20,7 +20,7 @@ final class OdometerRecordsProvider
   }) : super(
          retry: null,
          name: r'odometerRecordsProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -50,7 +50,7 @@ final class OdometerRecordsProvider
   }
 }
 
-String _$odometerRecordsHash() => r'f0af8bf28ff2779b4a16e72ac9f4abaf33f3266b';
+String _$odometerRecordsHash() => r'd6ce1ec86071feafefb4a414eb224dedd44fa86a';
 
 final class OdometerRecordsFamily extends $Family
     with
@@ -67,7 +67,7 @@ final class OdometerRecordsFamily extends $Family
         name: r'odometerRecordsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   OdometerRecordsProvider call(String carId) =>

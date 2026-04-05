@@ -19,24 +19,27 @@ class CarDashboardPage extends ConsumerStatefulWidget {
 }
 
 class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  TabController? _tabController;
 
   @override
   void initState() {
     super.initState();
-    final defaultTab = ref.read(defaultTabNotifierProvider);
-    _tabController = TabController(length: 4, vsync: this, initialIndex: defaultTab);
   }
 
   @override
   Widget build(BuildContext context) {
-    final carAsync = ref.watch(currentCarProvider(widget.carId));
+    final defaultTabAsync = ref.watch(defaultTabProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Car Details'),
-        bottom: TabBar(
-          controller: _tabController,
+    return defaultTabAsync.when(
+      data: (defaultTab) {
+        _tabController ??= TabController(length: 4, vsync: this, initialIndex: defaultTab);
+        final carAsync = ref.watch(currentCarProvider(widget.carId));
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Car Details'),
+            bottom: TabBar(
+              controller: _tabController,
           onTap: (index) => ref.read(hapticsConfigProvider.notifier).light(),
           tabs: const [
             Tab(text: 'Details'),
@@ -58,13 +61,7 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (car.photoUrl != null)
-                      Image.network(
-                        car.photoUrl!.contains('?') 
-                          ? '${car.photoUrl}&t=${DateTime.now().millisecondsSinceEpoch}'
-                          : '${car.photoUrl}?t=${DateTime.now().millisecondsSinceEpoch}',
-                        height: 200, 
-                        fit: BoxFit.cover
-                      ),
+                      Image.network(car.photoUrl!, height: 200, fit: BoxFit.cover),
                     const SizedBox(height: 16),
                     Text('Plate: ${car.licensePlate}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     if (car.make != null) Text('Make: ${car.make}', style: const TextStyle(fontSize: 18)),
@@ -100,11 +97,15 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
+      },
+      error: (e, st) => Scaffold(body: Center(child: Text('Error: $e'))),
+      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+    );
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 }

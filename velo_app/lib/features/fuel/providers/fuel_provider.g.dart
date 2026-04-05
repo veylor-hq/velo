@@ -20,7 +20,7 @@ final class FuelRecordsProvider
   }) : super(
          retry: null,
          name: r'fuelRecordsProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -50,7 +50,7 @@ final class FuelRecordsProvider
   }
 }
 
-String _$fuelRecordsHash() => r'4716cdc106f2823289bfc79ba8219b11d229615e';
+String _$fuelRecordsHash() => r'a7e1c8f17cb1fa3d1bb6ccb0e2d8e88dbb042db7';
 
 final class FuelRecordsFamily extends $Family
     with
@@ -67,7 +67,7 @@ final class FuelRecordsFamily extends $Family
         name: r'fuelRecordsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
 
   FuelRecordsProvider call(String carId) =>

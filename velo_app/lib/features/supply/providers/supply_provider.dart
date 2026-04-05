@@ -5,7 +5,7 @@ import '../service/supply_service.dart';
 
 part 'supply_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SupplyRecords extends _$SupplyRecords {
   @override
   FutureOr<List<SupplyRecord>> build() async {

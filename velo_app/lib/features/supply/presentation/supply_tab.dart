@@ -6,6 +6,7 @@ import '../service/supply_service.dart';
 import '../domain/supply_record.dart';
 
 import '../../../core/settings/currency_provider.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class SupplyTab extends ConsumerWidget {
   const SupplyTab({super.key});
@@ -33,23 +34,78 @@ class SupplyTab extends ConsumerWidget {
               itemCount: records.length,
               itemBuilder: (context, index) {
                 final r = records[index];
-                return ListTile(
-                  title: Text(r.name),
-                  subtitle: Text('Qty: ${r.quantity} @ $currency${r.pricePerUnit}\nVendor: ${r.vendor ?? "N/A"}'),
-                  isThreeLine: true,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(icon: const Icon(Icons.edit), onPressed: () => _showAddEditSheet(context, ref, r)),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await ref.read(supplyServiceProvider).deleteRecord(r.id);
-                          ref.invalidate(supplyRecordsProvider);
-                        },
+                return Stack(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(bottom: 24, right: 16, left: 16, top: index == 0 ? 16 : 0),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26),
                       ),
-                    ],
-                  ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(child: Text(r.name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.5))),
+                              if (r.isTool) const Icon(Icons.build, size: 20, color: Colors.grey),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('QUANTITY', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                  const SizedBox(height: 4),
+                                  Text('${r.quantity}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('PRICE', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                  const SizedBox(height: 4),
+                                  Text('$currency${r.pricePerUnit.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('VENDOR', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                  const SizedBox(height: 4),
+                                  Text(r.vendor?.toUpperCase() ?? 'N/A', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ],
+                          ),
+                          if (r.partNumber != null) ...[
+                            const SizedBox(height: 24),
+                            Text('PART#: ${r.partNumber}'),
+                          ],
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 20),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  ref.read(hapticsConfigProvider.notifier).light();
+                                  _showAddEditSheet(context, ref, r);
+                                },
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -59,7 +115,10 @@ class SupplyTab extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddEditSheet(context, ref),
+        onPressed: () {
+          ref.read(hapticsConfigProvider.notifier).heavy();
+          _showAddEditSheet(context, ref);
+        },
         child: const Icon(Icons.add),
       ),
     );
@@ -80,6 +139,7 @@ class _SupplySheetState extends ConsumerState<_SupplySheet> {
   final _qtyController = TextEditingController();
   final _priceController = TextEditingController();
   final _vendorController = TextEditingController();
+  final _partController = TextEditingController();
   bool _isTool = false;
   bool _isLoading = false;
 
@@ -91,6 +151,7 @@ class _SupplySheetState extends ConsumerState<_SupplySheet> {
       _qtyController.text = widget.record!.quantity.toString();
       _priceController.text = widget.record!.pricePerUnit.toString();
       _vendorController.text = widget.record!.vendor ?? '';
+      _partController.text = widget.record!.partNumber ?? '';
       _isTool = widget.record!.isTool;
     }
   }
@@ -105,6 +166,7 @@ class _SupplySheetState extends ConsumerState<_SupplySheet> {
         'quantity': int.tryParse(_qtyController.text) ?? 1,
         'price_per_unit': double.tryParse(_priceController.text) ?? 0.0,
         if (_vendorController.text.isNotEmpty) 'vendor': _vendorController.text.trim(),
+        if (_partController.text.isNotEmpty) 'part_number': _partController.text.trim(),
         'is_tool': _isTool,
       };
 
@@ -113,6 +175,7 @@ class _SupplySheetState extends ConsumerState<_SupplySheet> {
       } else {
         await ref.read(supplyServiceProvider).updateRecord(widget.record!.id, data);
       }
+      ref.read(hapticsConfigProvider.notifier).success();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -126,32 +189,60 @@ class _SupplySheetState extends ConsumerState<_SupplySheet> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 24, right: 24, top: 24,
+        left: 24, right: 24, top: 32,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(widget.record == null ? 'Add Supply' : 'Edit Supply', style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Name *')),
+          const SizedBox(height: 24),
           Row(
             children: [
               Expanded(child: TextField(controller: _qtyController, decoration: const InputDecoration(labelText: 'Quantity'), keyboardType: TextInputType.number)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               Expanded(child: TextField(controller: _priceController, decoration: const InputDecoration(labelText: 'Price/Unit'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
             ],
           ),
-          TextField(controller: _vendorController, decoration: const InputDecoration(labelText: 'Vendor')),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(child: TextField(controller: _vendorController, decoration: const InputDecoration(labelText: 'Vendor'))),
+              const SizedBox(width: 24),
+              Expanded(child: TextField(controller: _partController, decoration: const InputDecoration(labelText: 'Part #'))),
+            ],
+          ),
+          const SizedBox(height: 16),
           SwitchListTile(
+            contentPadding: EdgeInsets.zero,
             title: const Text('Is Tool?'),
             value: _isTool,
             onChanged: (v) => setState(() => _isTool = v),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           if (_isLoading) const Center(child: CircularProgressIndicator())
           else ElevatedButton(onPressed: _save, child: const Text('Save')),
-          const SizedBox(height: 24),
+          if (widget.record != null && !_isLoading) ...[
+            const SizedBox(height: 24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.1), foregroundColor: Colors.redAccent),
+              onPressed: () async {
+                ref.read(hapticsConfigProvider.notifier).heavy();
+                setState(() => _isLoading = true);
+                try {
+                  await ref.read(supplyServiceProvider).deleteRecord(widget.record!.id);
+                  if (mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  setState(() => _isLoading = false);
+                }
+              },
+              child: const Text('Delete Record'),
+            ),
+          ],
+          const SizedBox(height: 32),
         ],
       ),
     );

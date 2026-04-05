@@ -19,7 +19,7 @@ final class CarsProvider extends $AsyncNotifierProvider<Cars, List<Car>> {
         argument: null,
         retry: null,
         name: r'carsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -32,7 +32,7 @@ final class CarsProvider extends $AsyncNotifierProvider<Cars, List<Car>> {
   Cars create() => Cars();
 }
 
-String _$carsHash() => r'424b62e8926256ed65fb8fae7eb40f03d3034ff1';
+String _$carsHash() => r'f98c34c8aad0869c9b855aa934ae809ae9a491ed';
 
 abstract class _$Cars extends $AsyncNotifier<List<Car>> {
   FutureOr<List<Car>> build();

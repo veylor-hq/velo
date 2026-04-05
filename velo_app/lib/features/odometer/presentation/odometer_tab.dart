@@ -57,7 +57,7 @@ class OdometerTab extends ConsumerWidget {
                       ),
                       Expanded(
                         child: Container(
-                          margin: const EdgeInsets.only(bottom: 24, right: 16),
+                          margin: EdgeInsets.only(bottom: 24, right: 16, left: 16, top: index == 0 ? 16 : 0),
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
@@ -130,6 +130,7 @@ class _OdometerSheet extends ConsumerStatefulWidget {
 class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
   final _odometerController = TextEditingController();
   final _notesController = TextEditingController();
+  DateTime? _selectedDate;
   bool _isLoading = false;
 
   @override
@@ -145,7 +146,7 @@ class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
     setState(() => _isLoading = true);
     try {
       final data = {
-        'date': widget.record?.date ?? DateTime.now().toUtc().toIso8601String(),
+        'date': _selectedDate != null ? _selectedDate!.toUtc().toIso8601String() : widget.record?.date ?? DateTime.now().toUtc().toIso8601String(),
         'odometer': int.tryParse(_odometerController.text) ?? 0,
         if (_notesController.text.isNotEmpty) 'notes': _notesController.text,
       };
@@ -176,6 +177,24 @@ class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(widget.record == null ? 'Add Record' : 'Edit Record', style: const TextStyle(fontSize: 20)),
+          const SizedBox(height: 24),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Date'),
+            subtitle: Text(_selectedDate != null ? _selectedDate!.toLocal().toString().split(' ')[0] : (widget.record?.date?.split('T').first ?? 'Today')),
+            trailing: const Icon(Icons.calendar_today),
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _selectedDate ?? (widget.record != null ? DateTime.tryParse(widget.record!.date) ?? DateTime.now() : DateTime.now()),
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now(),
+              );
+              if (picked != null) {
+                setState(() => _selectedDate = picked);
+              }
+            },
+          ),
           const SizedBox(height: 24),
           TextField(controller: _odometerController, decoration: const InputDecoration(labelText: 'Odometer'), keyboardType: TextInputType.number),
           TextField(controller: _notesController, decoration: const InputDecoration(labelText: 'Notes')),

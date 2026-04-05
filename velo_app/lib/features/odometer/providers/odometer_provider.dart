@@ -5,7 +5,7 @@ import '../service/odometer_service.dart';
 
 part 'odometer_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class OdometerRecords extends _$OdometerRecords {
   @override
   FutureOr<List<OdometerRecord>> build(String carId) async {

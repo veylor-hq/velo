@@ -20,7 +20,7 @@ final class SupplyRecordsProvider
         argument: null,
         retry: null,
         name: r'supplyRecordsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -33,7 +33,7 @@ final class SupplyRecordsProvider
   SupplyRecords create() => SupplyRecords();
 }
 
-String _$supplyRecordsHash() => r'2d78880ad9856a39a1380d6ea747df96f47a7e5c';
+String _$supplyRecordsHash() => r'f9aee3d9cf7aad49bebefeae93170988fc826fc7';
 
 abstract class _$SupplyRecords extends $AsyncNotifier<List<SupplyRecord>> {
   FutureOr<List<SupplyRecord>> build();
