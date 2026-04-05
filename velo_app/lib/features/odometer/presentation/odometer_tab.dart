@@ -58,7 +58,7 @@ class OdometerTab extends ConsumerWidget {
                       Expanded(
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 24, right: 16),
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
                             border: Border.all(color: isDark ? Colors.white24 : Colors.black26),
@@ -176,14 +176,14 @@ class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(widget.record == null ? 'Add Record' : 'Edit Record', style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           TextField(controller: _odometerController, decoration: const InputDecoration(labelText: 'Odometer'), keyboardType: TextInputType.number),
           TextField(controller: _notesController, decoration: const InputDecoration(labelText: 'Notes')),
           const SizedBox(height: 24),
           if (_isLoading) const Center(child: CircularProgressIndicator())
           else ElevatedButton(onPressed: _save, child: const Text('Save')),
           if (widget.record != null && !_isLoading) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.1), foregroundColor: Colors.redAccent),
               onPressed: () async {

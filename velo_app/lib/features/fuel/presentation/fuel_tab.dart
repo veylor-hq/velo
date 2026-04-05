@@ -59,7 +59,7 @@ class FuelTab extends ConsumerWidget {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(24),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -211,12 +211,12 @@ class _FuelSheetState extends ConsumerState<_FuelSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(widget.record == null ? 'Add Fuel Record' : 'Edit Fuel Record', style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           TextField(controller: _odometerController, decoration: const InputDecoration(labelText: 'Odometer *'), keyboardType: TextInputType.number),
           Row(
             children: [
               Expanded(child: TextField(controller: _amountController, decoration: const InputDecoration(labelText: 'Amount *'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               Expanded(child: TextField(controller: _costController, decoration: const InputDecoration(labelText: 'Total Cost *'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
             ],
           ),
@@ -237,11 +237,11 @@ class _FuelSheetState extends ConsumerState<_FuelSheet> {
               value: _insertOdometer,
               onChanged: (v) => setState(() => _insertOdometer = v),
             ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           if (_isLoading) const Center(child: CircularProgressIndicator())
           else ElevatedButton(onPressed: _save, child: const Text('Save Record')),
           if (widget.record != null && !_isLoading) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.1), foregroundColor: Colors.redAccent),
               onPressed: () async {

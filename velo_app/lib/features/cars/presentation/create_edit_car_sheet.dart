@@ -147,7 +147,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           GestureDetector(
             onTap: _pickImage,
             child: Container(
@@ -172,7 +172,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
                   : null,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           TextField(
             controller: _plateController,
             decoration: const InputDecoration(labelText: 'License Plate *'),
@@ -180,14 +180,14 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
           Row(
             children: [
               Expanded(child: TextField(controller: _makeController, decoration: const InputDecoration(labelText: 'Make'))),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               Expanded(child: TextField(controller: _modelController, decoration: const InputDecoration(labelText: 'Model'))),
             ],
           ),
           Row(
             children: [
               Expanded(child: TextField(controller: _yearController, decoration: const InputDecoration(labelText: 'Year'), keyboardType: TextInputType.number)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               Expanded(child: TextField(controller: _colorController, decoration: const InputDecoration(labelText: 'Color'))),
             ],
           ),
@@ -204,7 +204,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
                   keyboardType: TextInputType.number,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               DropdownButton<String>(
                 value: _odometerUnit,
                 items: const [
@@ -219,7 +219,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
           Row(
             children: [
               const Text('Fuel Unit: '),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               DropdownButton<String>(
                 value: _fuelUnit,
                 items: const [
@@ -230,7 +230,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           if (_isLoading)
             const Center(child: CircularProgressIndicator())
           else
