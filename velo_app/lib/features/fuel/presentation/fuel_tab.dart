@@ -75,7 +75,7 @@ class FuelTab extends ConsumerWidget {
                               children: [
                                 const Text('COST', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
                                 const SizedBox(height: 4),
-                                Text('$currency${r.totalCost}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                Text('$currency${r.totalCost.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             Column(
@@ -83,7 +83,7 @@ class FuelTab extends ConsumerWidget {
                               children: [
                                 const Text('UNIT', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
                                 const SizedBox(height: 4),
-                                Text('$currency${r.pricePerUnit}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                Text('$currency${r.pricePerUnit.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             Column(
