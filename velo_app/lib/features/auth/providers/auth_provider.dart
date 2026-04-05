@@ -3,6 +3,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../service/auth_service.dart';
 
+import '../../cars/providers/cars_provider.dart';
+import '../../fuel/providers/fuel_provider.dart';
+import '../../odometer/providers/odometer_provider.dart';
+import '../../supply/providers/supply_provider.dart';
+
 part 'auth_provider.g.dart';
 
 enum AuthState { initial, authenticated, unauthenticated }
@@ -43,6 +48,11 @@ class AuthNotifier extends _$AuthNotifier {
 
   Future<void> signOut() async {
     await ref.read(authServiceProvider).signOut();
+    ref.invalidate(carsProvider);
+    ref.invalidate(currentCarProvider);
+    ref.invalidate(fuelRecordsProvider);
+    ref.invalidate(odometerRecordsProvider);
+    ref.invalidate(supplyRecordsProvider);
     state = AuthState.unauthenticated;
   }
 }
