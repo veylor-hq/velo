@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/currency_provider.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -10,6 +11,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currency = ref.watch(currencyProvider);
+    final themeMode = ref.watch(themeModeNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,6 +24,18 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('Profile'),
             onTap: () {
               context.push('/profile');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.dark_mode),
+            title: const Text('Theme Mode'),
+            subtitle: Text(themeMode.name.toUpperCase()),
+            onTap: () {
+              final current = ref.read(themeModeNotifierProvider);
+              final next = current == ThemeMode.system
+                  ? ThemeMode.dark
+                  : (current == ThemeMode.dark ? ThemeMode.light : ThemeMode.system);
+              ref.read(themeModeNotifierProvider.notifier).setTheme(next);
             },
           ),
           ListTile(
