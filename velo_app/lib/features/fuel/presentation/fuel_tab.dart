@@ -35,21 +35,86 @@ class FuelTab extends ConsumerWidget {
               itemCount: records.length,
               itemBuilder: (context, index) {
                 final r = records[index];
-                return ListTile(
-                  title: Text('${r.odometer} (Δ: ${r.deltaMileage ?? 0}) - $currency${r.totalCost}'),
-                  subtitle: Text('${r.date}\nAmount: ${r.fuelAmount} @ $currency${r.pricePerUnit}/unit\n${r.isFullTank ? "Full fill" : "Partial fill"}'),
-                  isThreeLine: true,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26, width: 1),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      IconButton(icon: const Icon(Icons.edit), onPressed: () => _showAddEditSheet(context, ref, r)),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await ref.read(fuelServiceProvider).deleteFuelRecord(carId, r.id);
-                          ref.invalidate(fuelRecordsProvider(carId));
-                        },
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border(bottom: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26, width: 1)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('LOG // ${r.date.split("T").first}', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                            Text('ODO: ${r.odometer} ${r.deltaMileage != null ? '(+${r.deltaMileage})' : ''}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                          ],
+                        ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('FUEL', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text('${r.fuelAmount}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('COST', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text('$currency${r.totalCost}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('UNIT', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text('$currency${r.pricePerUnit}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('TYPE', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text(r.isFullTank ? 'FULL' : 'PART', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (r.notes != null && r.notes!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text('NOTES: ${r.notes}', style: const TextStyle(fontStyle: FontStyle.italic)),
+                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(icon: const Icon(Icons.edit, size: 20), onPressed: () => _showAddEditSheet(context, ref, r)),
+                          IconButton(
+                            icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
+                            onPressed: () async {
+                              await ref.read(fuelServiceProvider).deleteFuelRecord(carId, r.id);
+                              ref.invalidate(fuelRecordsProvider(carId));
+                            },
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 );

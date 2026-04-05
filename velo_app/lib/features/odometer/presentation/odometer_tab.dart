@@ -32,20 +32,69 @@ class OdometerTab extends ConsumerWidget {
               itemCount: records.length,
               itemBuilder: (context, index) {
                 final r = records[index];
-                return ListTile(
-                  title: Text('${r.odometer}'),
-                  subtitle: Text('${r.date}\n${r.notes ?? ""}'),
-                  isThreeLine: r.notes != null && r.notes!.isNotEmpty,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+                final isFirst = index == 0;
+                final isLast = index == records.length - 1;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                
+                return IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      IconButton(icon: const Icon(Icons.edit), onPressed: () => _showAddEditSheet(context, ref, r)),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await ref.read(odometerServiceProvider).deleteRecord(carId, r.id);
-                          ref.invalidate(odometerRecordsProvider(carId));
-                        },
+                      SizedBox(
+                        width: 40,
+                        child: Column(
+                          children: [
+                            Container(width: 2, height: 20, color: isFirst ? Colors.transparent : (isDark ? Colors.white24 : Colors.black26)),
+                            Container(
+                              width: 12, height: 12,
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: isDark ? Colors.white : Colors.black),
+                            ),
+                            Expanded(child: Container(width: 2, color: isLast ? Colors.transparent : (isDark ? Colors.white24 : Colors.black26))),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 24, right: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            border: Border.all(color: isDark ? Colors.white24 : Colors.black26),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(r.date.split("T").first, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                                  Text('${r.odometer}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              if (r.notes != null && r.notes!.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Text(r.notes!),
+                              ],
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(icon: const Icon(Icons.edit, size: 20), padding: EdgeInsets.zero, constraints: const BoxConstraints(), onPressed: () => _showAddEditSheet(context, ref, r)),
+                                  const SizedBox(width: 16),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () async {
+                                      await ref.read(odometerServiceProvider).deleteRecord(carId, r.id);
+                                      ref.invalidate(odometerRecordsProvider(carId));
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),

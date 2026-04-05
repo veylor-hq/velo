@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import 'widgets/sidebar.dart';
 import '../../cars/providers/cars_provider.dart';
@@ -91,7 +92,9 @@ class DashboardPage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                );
+                ).animate(delay: (index * 100).ms)
+                 .fadeIn(duration: 400.ms, curve: Curves.easeOut)
+                 .slideX(begin: 0.05, end: 0, duration: 400.ms, curve: Curves.easeOutQuart);
               },
             ),
           );

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/services.dart';
 
 import '../providers/auth_provider.dart';
 
@@ -18,6 +20,14 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   bool _isLoading = false;
 
   Future<void> _signIn() async {
+    HapticFeedback.lightImpact();
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -89,7 +99,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
               ),
               const SizedBox(height: 24),
             ],
-          ),
+          ).animate().fadeIn(duration: 600.ms, curve: Curves.easeOut).slideY(begin: 0.05, end: 0, duration: 600.ms, curve: Curves.easeOutQuart),
         );
       },
     );

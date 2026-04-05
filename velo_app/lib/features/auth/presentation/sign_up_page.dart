@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/services.dart';
 
 import '../providers/auth_provider.dart';
 
@@ -19,6 +21,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   bool _isLoading = false;
 
   Future<void> _signUp() async {
+    HapticFeedback.lightImpact();
     if (_passwordController.text != _repeatPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
@@ -73,7 +76,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                 SizedBox(height: MediaQuery.of(context).padding.bottom),
               ],
             ),
-          ),
+          ).animate().fadeIn(duration: 600.ms, curve: Curves.easeOut).slideY(begin: 0.05, end: 0, duration: 600.ms, curve: Curves.easeOutQuart),
         );
       }
     } on DioException catch (e) {

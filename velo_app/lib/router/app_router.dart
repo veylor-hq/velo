@@ -9,12 +9,13 @@ import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/cars/presentation/car_dashboard_page.dart';
+import '../features/splash/presentation/splash_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     redirect: (BuildContext context, GoRouterState state) {
       if (authState == AuthState.initial) {
         return null; // Don't redirect until we know the state
@@ -23,6 +24,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState == AuthState.authenticated;
       final isGoingToAuthPaths = state.matchedLocation == '/signin' || 
                                  state.matchedLocation == '/signup';
+      final isSplash = state.matchedLocation == '/splash';
+
+      if (isSplash) return null;
 
       if (!isAuthenticated && !isGoingToAuthPaths) {
         return '/signin';
@@ -42,6 +46,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signup',
         builder: (BuildContext context, GoRouterState state) => const SignUpPage(),
+      ),
+      GoRoute(
+        path: '/splash',
+        builder: (BuildContext context, GoRouterState state) => const SplashPage(),
       ),
       GoRoute(
         path: '/',
