@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/config.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class ServerSetupPage extends ConsumerStatefulWidget {
   const ServerSetupPage({super.key});
@@ -34,7 +35,7 @@ class _ServerSetupPageState extends ConsumerState<ServerSetupPage> {
   }
 
   Future<void> _saveAndContinue() async {
-    HapticFeedback.lightImpact();
+    ref.read(hapticsConfigProvider.notifier).light();
     setState(() => _isLoading = true);
     
     final url = _serverUrlController.text.trim();

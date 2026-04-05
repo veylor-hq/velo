@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/auth_provider.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
@@ -21,7 +22,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   bool _isLoading = false;
 
   Future<void> _signUp() async {
-    HapticFeedback.lightImpact();
+    ref.read(hapticsConfigProvider.notifier).light();
     if (_passwordController.text != _repeatPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),

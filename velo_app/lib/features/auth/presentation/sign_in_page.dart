@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/auth_provider.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
@@ -20,7 +21,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   bool _isLoading = false;
 
   Future<void> _signIn() async {
-    HapticFeedback.lightImpact();
+    ref.read(hapticsConfigProvider.notifier).light();
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),

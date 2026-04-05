@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/currency_provider.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/settings/haptics_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -11,7 +12,8 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currency = ref.watch(currencyProvider);
-    final themeMode = ref.watch(themeModeNotifierProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final hapticsEnabled = ref.watch(hapticsConfigProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -31,11 +33,20 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('Theme Mode'),
             subtitle: Text(themeMode.name.toUpperCase()),
             onTap: () {
-              final current = ref.read(themeModeNotifierProvider);
+              final current = ref.read(themeModeProvider);
               final next = current == ThemeMode.system
                   ? ThemeMode.dark
                   : (current == ThemeMode.dark ? ThemeMode.light : ThemeMode.system);
-              ref.read(themeModeNotifierProvider.notifier).setTheme(next);
+              ref.read(themeModeProvider.notifier).setTheme(next);
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.vibration),
+            title: const Text('Haptic Feedback'),
+            subtitle: const Text('Tactile response on actions'),
+            value: hapticsEnabled,
+            onChanged: (val) {
+              ref.read(hapticsConfigProvider.notifier).toggle(val);
             },
           ),
           ListTile(
