@@ -41,17 +41,9 @@ class Sidebar extends ConsumerWidget {
               context.push('/settings');
             },
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Sign Out'),
-            onTap: () async {
-              Navigator.pop(context);
-              await ref.read(authProvider.notifier).signOut();
-            },
-          ),
         ],
       ),
     );
   }
 }
+

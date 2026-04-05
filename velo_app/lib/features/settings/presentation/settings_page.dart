@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/currency_provider.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -47,6 +48,14 @@ class SettingsPage extends ConsumerWidget {
               if (newCurrency != null && newCurrency.isNotEmpty) {
                 ref.read(currencyProvider.notifier).setCurrency(newCurrency.trim());
               }
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text('Sign Out', style: TextStyle(color: Colors.redAccent)),
+            onTap: () async {
+              await ref.read(authProvider.notifier).signOut();
             },
           ),
         ],
