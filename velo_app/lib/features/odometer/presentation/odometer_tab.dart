@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/odometer_provider.dart';
 import '../service/odometer_service.dart';
 import '../domain/odometer_record.dart';
+import 'package:intl/intl.dart';
 
 class OdometerTab extends ConsumerWidget {
   final String carId;
@@ -68,7 +69,7 @@ class OdometerTab extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(r.date.split("T").first, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                                  Text('${r.odometer}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  Text(NumberFormat("#,##0").format(r.odometer), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                 ],
                               ),
                               if (r.notes != null && r.notes!.isNotEmpty) ...[
