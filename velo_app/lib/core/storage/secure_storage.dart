@@ -18,4 +18,12 @@ class SecureStorageService {
   Future<void> deleteToken() async {
     await _storage.delete(key: _tokenKey);
   }
+
+  Future<void> setServerUrl(String url) async {
+    await _storage.write(key: 'custom_api_url', value: url.trim());
+  }
+
+  Future<String?> getServerUrl() async {
+    return await _storage.read(key: 'custom_api_url');
+  }
 }

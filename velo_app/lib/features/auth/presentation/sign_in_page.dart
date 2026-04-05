@@ -6,6 +6,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/auth_provider.dart';
+import '../../../core/config.dart';
+import '../../../core/storage/secure_storage.dart';
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
@@ -17,6 +19,7 @@ class SignInPage extends ConsumerStatefulWidget {
 class _SignInPageState extends ConsumerState<SignInPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _serverUrlController = TextEditingController(text: AppConfig.baseUrl);
   bool _isLoading = false;
 
   Future<void> _signIn() async {
@@ -31,6 +34,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     setState(() {
       _isLoading = true;
     });
+
+    const storage = SecureStorageService();
+    await storage.setServerUrl(_serverUrlController.text.trim());
 
     try {
       await ref.read(authProvider.notifier).signIn(

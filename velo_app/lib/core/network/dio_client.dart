@@ -21,6 +21,12 @@ Dio dio(Ref ref) {
       onRequest: (options, handler) async {
         final storage = const SecureStorageService();
         final token = await storage.getToken();
+        
+        final customUrl = await storage.getServerUrl();
+        if (customUrl != null && customUrl.isNotEmpty) {
+          options.baseUrl = customUrl;
+        }
+
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }

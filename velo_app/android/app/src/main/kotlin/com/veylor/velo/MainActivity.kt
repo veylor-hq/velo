@@ -1,4 +1,4 @@
-package com.example.velo_app
+package com.veylor.velo
 
 import io.flutter.embedding.android.FlutterActivity
 
