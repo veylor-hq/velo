@@ -6,8 +6,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/auth_provider.dart';
-import '../../../core/config.dart';
-import '../../../core/storage/secure_storage.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
@@ -20,7 +18,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repeatPasswordController = TextEditingController();
-  final _serverUrlController = TextEditingController(text: AppConfig.baseUrl);
   bool _isLoading = false;
 
   Future<void> _signUp() async {
@@ -35,9 +32,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     setState(() {
       _isLoading = true;
     });
-
-    const storage = SecureStorageService();
-    await storage.setServerUrl(_serverUrlController.text.trim());
 
     try {
       await ref.read(authProvider.notifier).signUp(
@@ -135,26 +129,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               controller: _repeatPasswordController,
               decoration: const InputDecoration(labelText: 'Repeat Password'),
               obscureText: true,
-            ),
-            const SizedBox(height: 24),
-            Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                title: const Text('Advanced Settings', style: TextStyle(fontWeight: FontWeight.bold)),
-                children: [
-                  TextFormField(
-                    controller: _serverUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Self-Hosted API URL',
-                      hintText: 'http://my-home-server.local:8000',
-                      prefixIcon: Icon(Icons.cloud),
-                    ),
-                    keyboardType: TextInputType.url,
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
             ),
             const SizedBox(height: 24),
             if (_isLoading)

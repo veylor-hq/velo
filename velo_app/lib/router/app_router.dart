@@ -10,9 +10,17 @@ import '../features/profile/presentation/profile_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/cars/presentation/car_dashboard_page.dart';
 import '../features/splash/presentation/splash_page.dart';
+import '../features/auth/presentation/server_setup_page.dart';
+
+import '../core/storage/secure_storage.dart';
+
+final serverUrlStateProvider = FutureProvider<String?>((ref) async {
+  return await const SecureStorageService().getServerUrl();
+});
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
+  final serverUrlState = ref.watch(serverUrlStateProvider);
 
   return GoRouter(
     initialLocation: '/splash',
@@ -23,13 +31,22 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isAuthenticated = authState == AuthState.authenticated;
       final isGoingToAuthPaths = state.matchedLocation == '/signin' || 
-                                 state.matchedLocation == '/signup';
+                                 state.matchedLocation == '/signup' ||
+                                 state.matchedLocation == '/server-setup';
       final isSplash = state.matchedLocation == '/splash';
+      final isServerSetup = state.matchedLocation == '/server-setup';
 
       if (isSplash) return null;
 
+      // Handle server URL resolution first
+      if (serverUrlState.isLoading) return null; 
+      final hasServerUrl = serverUrlState.value != null;
+      if (!hasServerUrl && !isServerSetup && !isAuthenticated) {
+        return '/server-setup';
+      }
+
       if (!isAuthenticated && !isGoingToAuthPaths) {
-        return '/signin';
+        return hasServerUrl ? '/signin' : '/server-setup';
       }
 
       if (isAuthenticated && isGoingToAuthPaths) {
@@ -39,6 +56,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: <RouteBase>[
+      GoRoute(
+        path: '/server-setup',
+        builder: (BuildContext context, GoRouterState state) => const ServerSetupPage(),
+      ),
       GoRoute(
         path: '/signin',
         builder: (BuildContext context, GoRouterState state) => const SignInPage(),
