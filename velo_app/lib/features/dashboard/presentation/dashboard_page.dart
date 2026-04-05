@@ -85,13 +85,6 @@ class DashboardPage extends ConsumerWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  ref.read(hapticsConfigProvider.notifier).light();
-                                  CreateEditCarSheet.show(context, car: car);
-                                },
-                              )
                             ],
                           ),
                         )

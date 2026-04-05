@@ -113,14 +113,6 @@ class FuelTab extends ConsumerWidget {
                               _showAddEditSheet(context, ref, r);
                             },
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
-                            onPressed: () async {
-                              ref.read(hapticsConfigProvider.notifier).medium();
-                              await ref.read(fuelServiceProvider).deleteFuelRecord(carId, r.id);
-                              ref.invalidate(fuelRecordsProvider(carId));
-                            },
-                          ),
                         ],
                       )
                     ],
@@ -248,6 +240,24 @@ class _FuelSheetState extends ConsumerState<_FuelSheet> {
           const SizedBox(height: 16),
           if (_isLoading) const Center(child: CircularProgressIndicator())
           else ElevatedButton(onPressed: _save, child: const Text('Save Record')),
+          if (widget.record != null && !_isLoading) ...[
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.1), foregroundColor: Colors.redAccent),
+              onPressed: () async {
+                ref.read(hapticsConfigProvider.notifier).heavy();
+                setState(() => _isLoading = true);
+                try {
+                  await ref.read(fuelServiceProvider).deleteFuelRecord(carId: widget.carId, recordId: widget.record!.id);
+                  if (mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  setState(() => _isLoading = false);
+                }
+              },
+              child: const Text('Delete Record'),
+            ),
+          ],
           const SizedBox(height: 24),
         ],
       ),

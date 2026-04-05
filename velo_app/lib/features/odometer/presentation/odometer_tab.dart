@@ -90,17 +90,6 @@ class OdometerTab extends ConsumerWidget {
                                       _showAddEditSheet(context, ref, r);
                                     },
                                   ),
-                                  const SizedBox(width: 16),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () async {
-                                      ref.read(hapticsConfigProvider.notifier).medium();
-                                      await ref.read(odometerServiceProvider).deleteRecord(carId, r.id);
-                                      ref.invalidate(odometerRecordsProvider(carId));
-                                    },
-                                  ),
                                 ],
                               )
                             ],
@@ -193,6 +182,24 @@ class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
           const SizedBox(height: 24),
           if (_isLoading) const Center(child: CircularProgressIndicator())
           else ElevatedButton(onPressed: _save, child: const Text('Save')),
+          if (widget.record != null && !_isLoading) ...[
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.1), foregroundColor: Colors.redAccent),
+              onPressed: () async {
+                ref.read(hapticsConfigProvider.notifier).heavy();
+                setState(() => _isLoading = true);
+                try {
+                  await ref.read(odometerServiceProvider).deleteRecord(widget.carId, widget.record!.id);
+                  if (mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  setState(() => _isLoading = false);
+                }
+              },
+              child: const Text('Delete Record'),
+            ),
+          ],
           const SizedBox(height: 24),
         ],
       ),
