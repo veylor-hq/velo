@@ -9,7 +9,6 @@ import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/cars/presentation/car_dashboard_page.dart';
-import '../features/splash/presentation/splash_page.dart';
 import '../features/auth/presentation/server_setup_page.dart';
 
 import '../core/storage/secure_storage.dart';
@@ -23,7 +22,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final serverUrlState = ref.watch(serverUrlStateProvider);
 
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/',
     redirect: (BuildContext context, GoRouterState state) {
       if (authState == AuthState.initial) {
         return null; // Don't redirect until we know the state
@@ -33,10 +32,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isGoingToAuthPaths = state.matchedLocation == '/signin' || 
                                  state.matchedLocation == '/signup' ||
                                  state.matchedLocation == '/server-setup';
-      final isSplash = state.matchedLocation == '/splash';
       final isServerSetup = state.matchedLocation == '/server-setup';
-
-      if (isSplash) return null;
 
       // Handle server URL resolution first
       if (serverUrlState.isLoading) return null; 
@@ -67,10 +63,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signup',
         builder: (BuildContext context, GoRouterState state) => const SignUpPage(),
-      ),
-      GoRoute(
-        path: '/splash',
-        builder: (BuildContext context, GoRouterState state) => const SplashPage(),
       ),
       GoRoute(
         path: '/',
