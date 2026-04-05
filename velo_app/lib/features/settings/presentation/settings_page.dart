@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/currency_provider.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/settings/haptics_provider.dart';
+import '../../../../core/settings/default_tab_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -14,6 +15,9 @@ class SettingsPage extends ConsumerWidget {
     final currency = ref.watch(currencyProvider);
     final themeMode = ref.watch(themeModeProvider);
     final hapticsEnabled = ref.watch(hapticsConfigProvider);
+    final defaultTab = ref.watch(defaultTabNotifierProvider);
+
+    final tabNames = ['Details', 'Fuel', 'Odometer', 'Supply'];
 
     return Scaffold(
       appBar: AppBar(
@@ -47,6 +51,27 @@ class SettingsPage extends ConsumerWidget {
             value: hapticsEnabled,
             onChanged: (val) {
               ref.read(hapticsConfigProvider.notifier).toggle(val);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.tab),
+            title: const Text('Default Car Tab'),
+            subtitle: Text(tabNames[defaultTab < 0 || defaultTab > 3 ? 1 : defaultTab]),
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (ctx) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(4, (index) => ListTile(
+                    title: Text(tabNames[index]),
+                    trailing: defaultTab == index ? const Icon(Icons.check) : null,
+                    onTap: () {
+                      ref.read(defaultTabNotifierProvider.notifier).setTab(index);
+                      Navigator.pop(ctx);
+                    },
+                  )),
+                )
+              );
             },
           ),
           ListTile(

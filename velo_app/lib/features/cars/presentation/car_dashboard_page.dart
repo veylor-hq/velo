@@ -7,6 +7,7 @@ import '../../fuel/presentation/fuel_tab.dart';
 import '../../odometer/presentation/odometer_tab.dart';
 import '../../supply/presentation/supply_tab.dart';
 import '../../../core/settings/haptics_provider.dart';
+import '../../../core/settings/default_tab_provider.dart';
 
 class CarDashboardPage extends ConsumerStatefulWidget {
   final String carId;
@@ -23,7 +24,8 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    final defaultTab = ref.read(defaultTabNotifierProvider);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: defaultTab);
   }
 
   @override
@@ -56,7 +58,13 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (car.photoUrl != null)
-                      Image.network(car.photoUrl!, height: 200, fit: BoxFit.cover),
+                      Image.network(
+                        car.photoUrl!.contains('?') 
+                          ? '${car.photoUrl}&t=${DateTime.now().millisecondsSinceEpoch}'
+                          : '${car.photoUrl}?t=${DateTime.now().millisecondsSinceEpoch}',
+                        height: 200, 
+                        fit: BoxFit.cover
+                      ),
                     const SizedBox(height: 16),
                     Text('Plate: ${car.licensePlate}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     if (car.make != null) Text('Make: ${car.make}', style: const TextStyle(fontSize: 18)),

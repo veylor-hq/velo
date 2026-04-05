@@ -56,7 +56,9 @@ class DashboardPage extends ConsumerWidget {
                       children: [
                         if (car.photoUrl != null)
                           Image.network(
-                            car.photoUrl!,
+                            car.photoUrl!.contains('?') 
+                              ? '${car.photoUrl}&t=${DateTime.now().millisecondsSinceEpoch}'
+                              : '${car.photoUrl}?t=${DateTime.now().millisecondsSinceEpoch}',
                             height: 200,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) => Container(
