@@ -6,6 +6,7 @@ import '../service/fuel_service.dart';
 import '../domain/fuel_record.dart';
 
 import '../../../core/settings/currency_provider.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class FuelTab extends ConsumerWidget {
   final String carId;
@@ -105,10 +106,17 @@ class FuelTab extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          IconButton(icon: const Icon(Icons.edit, size: 20), onPressed: () => _showAddEditSheet(context, ref, r)),
+                          IconButton(
+                            icon: const Icon(Icons.edit, size: 20),
+                            onPressed: () {
+                              ref.read(hapticsConfigProvider.notifier).light();
+                              _showAddEditSheet(context, ref, r);
+                            },
+                          ),
                           IconButton(
                             icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
                             onPressed: () async {
+                              ref.read(hapticsConfigProvider.notifier).medium();
                               await ref.read(fuelServiceProvider).deleteFuelRecord(carId, r.id);
                               ref.invalidate(fuelRecordsProvider(carId));
                             },
@@ -126,7 +134,10 @@ class FuelTab extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddEditSheet(context, ref),
+        onPressed: () {
+          ref.read(hapticsConfigProvider.notifier).heavy();
+          _showAddEditSheet(context, ref);
+        },
         child: const Icon(Icons.local_gas_station),
       ),
     );
@@ -187,6 +198,7 @@ class _FuelSheetState extends ConsumerState<_FuelSheet> {
       } else {
         await ref.read(fuelServiceProvider).updateFuelRecord(carId: widget.carId, recordId: widget.record!.id, data: data);
       }
+      ref.read(hapticsConfigProvider.notifier).success();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));

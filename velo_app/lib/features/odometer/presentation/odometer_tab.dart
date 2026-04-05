@@ -5,6 +5,7 @@ import '../providers/odometer_provider.dart';
 import '../service/odometer_service.dart';
 import '../domain/odometer_record.dart';
 import 'package:intl/intl.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class OdometerTab extends ConsumerWidget {
   final String carId;
@@ -80,13 +81,22 @@ class OdometerTab extends ConsumerWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  IconButton(icon: const Icon(Icons.edit, size: 20), padding: EdgeInsets.zero, constraints: const BoxConstraints(), onPressed: () => _showAddEditSheet(context, ref, r)),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, size: 20),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () {
+                                      ref.read(hapticsConfigProvider.notifier).light();
+                                      _showAddEditSheet(context, ref, r);
+                                    },
+                                  ),
                                   const SizedBox(width: 16),
                                   IconButton(
                                     icon: const Icon(Icons.delete, size: 20, color: Colors.redAccent),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     onPressed: () async {
+                                      ref.read(hapticsConfigProvider.notifier).medium();
                                       await ref.read(odometerServiceProvider).deleteRecord(carId, r.id);
                                       ref.invalidate(odometerRecordsProvider(carId));
                                     },
@@ -108,7 +118,10 @@ class OdometerTab extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddEditSheet(context, ref),
+        onPressed: () {
+          ref.read(hapticsConfigProvider.notifier).heavy();
+          _showAddEditSheet(context, ref);
+        },
         child: const Icon(Icons.add),
       ),
     );
@@ -153,6 +166,7 @@ class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
       } else {
         await ref.read(odometerServiceProvider).updateRecord(widget.carId, widget.record!.id, data);
       }
+      ref.read(hapticsConfigProvider.notifier).success();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));

@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/sidebar.dart';
 import '../../cars/providers/cars_provider.dart';
 import '../../cars/presentation/create_edit_car_sheet.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -20,7 +21,10 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(carsProvider.notifier).refreshCars(),
+            onPressed: () {
+              ref.read(hapticsConfigProvider.notifier).light();
+              ref.read(carsProvider.notifier).refreshCars();
+            },
           )
         ],
       ),
@@ -44,6 +48,7 @@ class DashboardPage extends ConsumerWidget {
                   margin: const EdgeInsets.only(bottom: 16),
                   child: InkWell(
                     onTap: () {
+                      ref.read(hapticsConfigProvider.notifier).light();
                       context.push('/car/${car.id}');
                     },
                     child: Column(
@@ -81,8 +86,7 @@ class DashboardPage extends ConsumerWidget {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
-                                  // The list item only has basic info. We could fetch full info 
-                                  // before showing edit, but for simplicity we'll pass what we have.
+                                  ref.read(hapticsConfigProvider.notifier).light();
                                   CreateEditCarSheet.show(context, car: car);
                                 },
                               )
@@ -104,6 +108,7 @@ class DashboardPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          ref.read(hapticsConfigProvider.notifier).heavy();
           CreateEditCarSheet.show(context);
         },
         child: const Icon(Icons.add),

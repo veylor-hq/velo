@@ -6,6 +6,7 @@ import '../../cars/presentation/create_edit_car_sheet.dart';
 import '../../fuel/presentation/fuel_tab.dart';
 import '../../odometer/presentation/odometer_tab.dart';
 import '../../supply/presentation/supply_tab.dart';
+import '../../../core/settings/haptics_provider.dart';
 
 class CarDashboardPage extends ConsumerStatefulWidget {
   final String carId;
@@ -34,6 +35,7 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
         title: const Text('Car Details'),
         bottom: TabBar(
           controller: _tabController,
+          onTap: (index) => ref.read(hapticsConfigProvider.notifier).light(),
           tabs: const [
             Tab(text: 'Details'),
             Tab(text: 'Fuel'),
@@ -67,6 +69,7 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
+                        ref.read(hapticsConfigProvider.notifier).light();
                         CreateEditCarSheet.show(context, car: car).then((_) {
                           ref.invalidate(currentCarProvider(car.id));
                         });
