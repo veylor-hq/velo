@@ -13,15 +13,20 @@ class Sidebar extends ConsumerWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
+          DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.deepPurple,
+              color: Theme.of(context).scaffoldBackgroundColor,
+              border: Border(bottom: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, width: 2)),
             ),
-            child: Text(
-              'Velo Menu',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+            child: const Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                'VELO',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 4,
+                ),
               ),
             ),
           ),
