@@ -31,12 +31,32 @@ class OdometerTab extends ConsumerWidget {
           return RefreshIndicator(
             onRefresh: () => ref.read(odometerRecordsProvider(carId).notifier).refresh(),
             child: ListView.builder(
-              itemCount: records.length,
+              itemCount: records.length + 1,
               itemBuilder: (context, index) {
-                final r = records[index];
-                final isFirst = index == 0;
-                final isLast = index == records.length - 1;
+                if (index == 0) {
+                  if (records.length < 2) return const SizedBox.shrink();
+                  final totalMiles = (records.first.odometer - records.last.odometer).abs();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                    child: Text(
+                      'Miles covered: ${NumberFormat("#,##0").format(totalMiles)}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.grey, fontSize: 12, letterSpacing: 1),
+                    ),
+                  );
+                }
+
+                final recordIndex = index - 1;
+                final r = records[recordIndex];
+                final isFirst = recordIndex == 0;
+                final isLast = recordIndex == records.length - 1;
                 final isDark = Theme.of(context).brightness == Brightness.dark;
+                
+                int? delta;
+                if (recordIndex < records.length - 1) {
+                  delta = r.odometer - records[recordIndex + 1].odometer;
+                  if (delta < 0) delta = -delta;
+                }
                 
                 return IntrinsicHeight(
                   child: Row(
@@ -57,7 +77,7 @@ class OdometerTab extends ConsumerWidget {
                       ),
                       Expanded(
                         child: Container(
-                          margin: EdgeInsets.only(bottom: 24, right: 16, left: 16, top: index == 0 ? 16 : 0),
+                          margin: EdgeInsets.only(bottom: 24, right: 16, left: 16, top: recordIndex == 0 ? 16 : 0),
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
@@ -70,7 +90,14 @@ class OdometerTab extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(r.date.split("T").first, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                                  Text(NumberFormat("#,##0").format(r.odometer), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(NumberFormat("#,##0").format(r.odometer), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      if (delta != null)
+                                        Text('+${NumberFormat("#,##0").format(delta)}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                                    ],
+                                  ),
                                 ],
                               ),
                               if (r.notes != null && r.notes!.isNotEmpty) ...[
