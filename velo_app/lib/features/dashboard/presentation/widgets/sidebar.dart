@@ -39,6 +39,14 @@ class Sidebar extends ConsumerWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.build),
+            title: const Text('Global Supplies'),
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/supplies');
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {

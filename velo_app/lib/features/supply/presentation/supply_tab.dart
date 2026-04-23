@@ -25,6 +25,7 @@ class SupplyTab extends ConsumerWidget {
     final currency = ref.watch(currencyProvider);
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Global Supplies')),
       body: asyncRecords.when(
         data: (records) {
           if (records.isEmpty) return const Center(child: Text('No supply records.'));

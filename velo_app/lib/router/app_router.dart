@@ -10,6 +10,7 @@ import '../features/profile/presentation/profile_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/cars/presentation/car_dashboard_page.dart';
 import '../features/auth/presentation/server_setup_page.dart';
+import '../features/supply/presentation/supply_tab.dart';
 
 import '../core/storage/secure_storage.dart';
 
@@ -82,6 +83,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (BuildContext context, GoRouterState state) => const ProfilePage(),
+      ),
+      GoRoute(
+        path: '/supplies',
+        builder: (BuildContext context, GoRouterState state) => const SupplyTab(),
       ),
     ],
   );

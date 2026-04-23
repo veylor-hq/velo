@@ -18,7 +18,7 @@ class SettingsPage extends ConsumerWidget {
     final defaultTabAsync = ref.watch(defaultTabProvider);
     final defaultTab = defaultTabAsync.value ?? 1;
 
-    final tabNames = ['Details', 'Fuel', 'Odometer', 'Supply'];
+    final tabNames = ['Details', 'Fuel', 'Odometer'];
 
     return Scaffold(
       appBar: AppBar(
@@ -57,13 +57,13 @@ class SettingsPage extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.tab),
             title: const Text('Default Car Tab'),
-            subtitle: Text(tabNames[defaultTab < 0 || defaultTab > 3 ? 1 : defaultTab]),
+            subtitle: Text(tabNames[defaultTab < 0 || defaultTab > 2 ? 1 : defaultTab]),
             onTap: () {
               showModalBottomSheet(
                 context: context,
                 builder: (ctx) => Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: List.generate(4, (index) => ListTile(
+                  children: List.generate(3, (index) => ListTile(
                     title: Text(tabNames[index]),
                     trailing: defaultTab == index ? const Icon(Icons.check) : null,
                     onTap: () {

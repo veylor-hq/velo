@@ -33,88 +33,178 @@ class FuelTab extends ConsumerWidget {
           return RefreshIndicator(
             onRefresh: () => ref.read(fuelRecordsProvider(carId).notifier).refresh(),
             child: ListView.builder(
-              itemCount: records.length,
+              itemCount: records.length + 1,
               itemBuilder: (context, index) {
-                final r = records[index];
-                return Container(
-                  margin: EdgeInsets.only(bottom: 24, right: 16, left: 16, top: index == 0 ? 16 : 0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26, width: 1),
-                  ),
-                  child: Column(
+                if (index == 0) {
+                  if (records.isEmpty) return const SizedBox.shrink();
+                  double totalSpend = 0;
+                  double totalFuel = 0;
+                  double validDistance = 0;
+                  double validFuel = 0;
+
+                  for (var r in records) {
+                    totalSpend += r.totalCost;
+                    totalFuel += r.fuelAmount;
+                    if (!r.skipMpgCalculation && r.deltaMileage != null && r.fuelAmount > 0) {
+                      validDistance += r.deltaMileage!;
+                      validFuel += r.fuelAmount;
+                    }
+                  }
+
+                  final avgMpg = validFuel > 0 ? (validDistance / validFuel) : 0.0;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 24, right: 16, left: 16, top: 16),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text('LIFETIME SUMMARY', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('SPEND', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text('$currency${totalSpend.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('CONSUMED', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text(totalFuel.toStringAsFixed(1), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('AVG MPG', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text(avgMpg.toStringAsFixed(1), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                }
+
+                final recordIndex = index - 1;
+                final r = records[recordIndex];
+                final isFirst = recordIndex == 0;
+                final isLast = recordIndex == records.length - 1;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+
+                return IntrinsicHeight(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26, width: 1)),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      SizedBox(
+                        width: 40,
+                        child: Column(
                           children: [
-                            Text('LOG // ${r.date.split("T").first}', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                            Text('ODO: ${r.odometer} ${r.deltaMileage != null ? '(+${r.deltaMileage})' : ''}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                            Container(width: 2, height: 20, color: isFirst ? Colors.transparent : (isDark ? Colors.white24 : Colors.black26)),
+                            Container(
+                              width: 12, height: 12,
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: isDark ? Colors.white : Colors.black),
+                            ),
+                            Expanded(child: Container(width: 2, color: isLast ? Colors.transparent : (isDark ? Colors.white24 : Colors.black26))),
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('FUEL', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
-                                const SizedBox(height: 4),
-                                Text('${r.fuelAmount}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('COST', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
-                                const SizedBox(height: 4),
-                                Text('$currency${r.totalCost.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('UNIT', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
-                                const SizedBox(height: 4),
-                                Text('$currency${r.pricePerUnit.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('TYPE', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
-                                const SizedBox(height: 4),
-                                Text(r.isFullTank ? 'FULL' : 'PART', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (r.notes != null && r.notes!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Text('NOTES: ${r.notes}', style: const TextStyle(fontStyle: FontStyle.italic)),
-                        ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, size: 20),
-                            onPressed: () {
-                              ref.read(hapticsConfigProvider.notifier).light();
-                              _showAddEditSheet(context, ref, r);
-                            },
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 24, right: 16, top: recordIndex == 0 ? 16 : 0),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26, width: 1),
                           ),
-                        ],
-                      )
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  border: Border(bottom: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black26, width: 1)),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('LOG // ${r.date.split("T").first}', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                                    Text('ODO: ${r.odometer} ${r.deltaMileage != null ? '(+${r.deltaMileage})' : ''}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('FUEL', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                        const SizedBox(height: 4),
+                                        Text('${r.fuelAmount}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('COST', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                        const SizedBox(height: 4),
+                                        Text('$currency${r.totalCost.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('UNIT', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                        const SizedBox(height: 4),
+                                        Text('$currency${r.pricePerUnit.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('TYPE', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
+                                        const SizedBox(height: 4),
+                                        Text(r.isFullTank ? 'FULL' : 'PART', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (r.notes != null && r.notes!.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  child: Text('NOTES: ${r.notes}', style: const TextStyle(fontStyle: FontStyle.italic)),
+                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, size: 20),
+                                    onPressed: () {
+                                      ref.read(hapticsConfigProvider.notifier).light();
+                                      _showAddEditSheet(context, ref, r);
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 );

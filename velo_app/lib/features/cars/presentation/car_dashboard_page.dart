@@ -5,7 +5,6 @@ import '../../cars/providers/cars_provider.dart';
 import '../../cars/presentation/create_edit_car_sheet.dart';
 import '../../fuel/presentation/fuel_tab.dart';
 import '../../odometer/presentation/odometer_tab.dart';
-import '../../supply/presentation/supply_tab.dart';
 import '../../../core/settings/haptics_provider.dart';
 import '../../../core/settings/default_tab_provider.dart';
 
@@ -32,7 +31,8 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
 
     return defaultTabAsync.when(
       data: (defaultTab) {
-        _tabController ??= TabController(length: 4, vsync: this, initialIndex: defaultTab);
+        final safeIndex = defaultTab >= 3 ? 1 : defaultTab;
+        _tabController ??= TabController(length: 3, vsync: this, initialIndex: safeIndex);
         final carAsync = ref.watch(currentCarProvider(widget.carId));
 
         return Scaffold(
@@ -45,7 +45,6 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
             Tab(text: 'Details'),
             Tab(text: 'Fuel'),
             Tab(text: 'Odometer'),
-            Tab(text: 'Supply'),
           ],
         ),
       ),
@@ -88,8 +87,6 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
               FuelTab(carId: car.id),
               // Odometer Tab
               OdometerTab(carId: car.id),
-              // Supply Tab
-              const SupplyTab(),
             ],
           );
         },
