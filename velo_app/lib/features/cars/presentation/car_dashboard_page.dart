@@ -9,6 +9,8 @@ import '../../odometer/presentation/odometer_tab.dart';
 import '../../service/presentation/service_tab.dart';
 import '../../../core/settings/haptics_provider.dart';
 import '../../../core/settings/default_tab_provider.dart';
+import '../../../core/settings/currency_provider.dart';
+import '../domain/car.dart';
 
 class CarDashboardPage extends ConsumerStatefulWidget {
   final String carId;
@@ -25,6 +27,38 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
   @override
   void initState() {
     super.initState();
+  }
+
+  String _calculateOwnershipDuration(CarSalesMeta? meta) {
+    if (meta == null || meta.dateBought == null) return 'N/A';
+    final bought = DateTime.tryParse(meta.dateBought!)?.toLocal();
+    if (bought == null) return 'N/A';
+    final end = meta.dateSold != null ? DateTime.tryParse(meta.dateSold!)?.toLocal() ?? DateTime.now() : DateTime.now();
+    final difference = end.difference(bought);
+    final days = difference.inDays;
+    
+    if (days < 0) return 'Not yet bought';
+    if (days == 0) return 'Bought today';
+
+    int years = (days / 365).floor();
+    int remainingDays = days % 365;
+    int months = (remainingDays / 30).floor();
+    int rDays = remainingDays % 30;
+
+    List<String> parts = [];
+    if (years > 0) parts.add('$years year${years == 1 ? '' : 's'}');
+    if (months > 0) parts.add('$months month${months == 1 ? '' : 's'}');
+
+    if (rDays > 0) {
+      if (years == 0) {
+        parts.add('$rDays day${rDays == 1 ? '' : 's'}');
+      } else if (months == 0) {
+        parts.add('$rDays day${rDays == 1 ? '' : 's'}');
+      }
+    }
+
+    if (parts.isEmpty) return '0 days';
+    return parts.join(', ');
   }
 
   @override
@@ -72,7 +106,13 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
                     if (car.color != null) Text('Color: ${car.color}', style: const TextStyle(fontSize: 18)),
                     if (car.vin != null) Text('VIN: ${car.vin}', style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 8),
-                    Text('Current Odometer: ${car.currentOdometer ?? 0} ${car.odometerUnit ?? ''}'),
+                    Text('Current Odometer: ${car.currentOdometer ?? 0} ${car.odometerUnit ?? ''}', style: const TextStyle(fontSize: 18)),
+                    const SizedBox(height: 24),
+                    const Text('OWNERSHIP', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                    const SizedBox(height: 8),
+                    Text('Duration: ${_calculateOwnershipDuration(car.salesMeta)}', style: const TextStyle(fontSize: 16)),
+                    if (car.salesMeta?.priceBought != null) Text('Bought Price: ${ref.watch(currencyProvider)}${car.salesMeta!.priceBought!.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16)),
+                    if (car.salesMeta?.priceSold != null) Text('Sold Price: ${ref.watch(currencyProvider)}${car.salesMeta!.priceSold!.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16)),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {

@@ -40,6 +40,11 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
   String _odometerUnit = 'km';
   String _fuelUnit = 'l';
 
+  final _priceBoughtController = TextEditingController();
+  final _priceSoldController = TextEditingController();
+  DateTime? _dateBought;
+  DateTime? _dateSold;
+
   File? _selectedImage;
   bool _isLoading = false;
 
@@ -57,6 +62,12 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
       _odometerController.text = c.currentOdometer?.toString() ?? '0';
       _odometerUnit = c.odometerUnit ?? 'km';
       _fuelUnit = c.fuelUnit ?? 'l';
+      if (c.salesMeta != null) {
+        _priceBoughtController.text = c.salesMeta!.priceBought?.toString() ?? '';
+        _priceSoldController.text = c.salesMeta!.priceSold?.toString() ?? '';
+        _dateBought = c.salesMeta!.dateBought != null ? DateTime.tryParse(c.salesMeta!.dateBought!) : null;
+        _dateSold = c.salesMeta!.dateSold != null ? DateTime.tryParse(c.salesMeta!.dateSold!) : null;
+      }
     }
   }
 
@@ -99,6 +110,17 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
         'fuel_unit': _fuelUnit,
         'initial_odometer': int.tryParse(_odometerController.text) ?? 0,
       };
+
+      final salesMeta = {
+        if (_priceBoughtController.text.isNotEmpty) 'price_bought': double.tryParse(_priceBoughtController.text),
+        if (_priceSoldController.text.isNotEmpty) 'price_sold': double.tryParse(_priceSoldController.text),
+        if (_dateBought != null) 'date_bought': _dateBought!.toUtc().toIso8601String(),
+        if (_dateSold != null) 'date_sold': _dateSold!.toUtc().toIso8601String(),
+      };
+      
+      if (salesMeta.isNotEmpty) {
+        data['sales_meta'] = salesMeta;
+      }
 
       if (widget.carToEdit == null) {
         await ref.read(carServiceProvider).createCar(
@@ -230,6 +252,51 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
               ),
             ],
           ),
+          const SizedBox(height: 24),
+          const Text('SALES META', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Date Bought', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  subtitle: Text(_dateBought != null ? _dateBought!.toLocal().toString().split(' ')[0] : 'Not set'),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _dateBought ?? DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2100),
+                    );
+                    if (picked != null) setState(() => _dateBought = picked);
+                  },
+                ),
+              ),
+              Expanded(child: TextField(controller: _priceBoughtController, decoration: const InputDecoration(labelText: 'Price Bought'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Date Sold', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  subtitle: Text(_dateSold != null ? _dateSold!.toLocal().toString().split(' ')[0] : 'Not set'),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _dateSold ?? DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2100),
+                    );
+                    if (picked != null) setState(() => _dateSold = picked);
+                  },
+                ),
+              ),
+              Expanded(child: TextField(controller: _priceSoldController, decoration: const InputDecoration(labelText: 'Price Sold'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
+            ],
+          ),
           const SizedBox(height: 32),
           if (_isLoading)
             const Center(child: CircularProgressIndicator())
@@ -252,6 +319,8 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
     _colorController.dispose();
     _vinController.dispose();
     _odometerController.dispose();
+    _priceBoughtController.dispose();
+    _priceSoldController.dispose();
     super.dispose();
   }
 }
