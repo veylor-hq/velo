@@ -6,6 +6,8 @@ import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/settings/haptics_provider.dart';
 import '../../../../core/settings/default_tab_provider.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../cars/providers/cars_provider.dart';
+import 'package:home_widget/home_widget.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -99,6 +101,35 @@ class SettingsPage extends ConsumerWidget {
               if (newCurrency != null && newCurrency.isNotEmpty) {
                 ref.read(currencyProvider.notifier).setCurrency(newCurrency.trim());
               }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.widgets),
+            title: const Text('Home Screen Widget'),
+            subtitle: const Text('Select a car for your widget'),
+            onTap: () {
+              final carsAsync = ref.read(carsProvider);
+              if (carsAsync.value == null || carsAsync.value!.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No cars available')));
+                return;
+              }
+              showModalBottomSheet(
+                context: context,
+                builder: (ctx) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: carsAsync.value!.map((c) => ListTile(
+                    title: Text(c.licensePlate),
+                    subtitle: Text('${c.make ?? ''} ${c.model ?? ''}'),
+                    onTap: () async {
+                      await HomeWidget.saveWidgetData<String>('widget_car_id', c.id);
+                      await HomeWidget.saveWidgetData<String>('widget_car_name', c.licensePlate);
+                      await HomeWidget.updateWidget(androidName: 'FuelWidgetProvider');
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Widget linked to ${c.licensePlate}!')));
+                    },
+                  )).toList(),
+                )
+              );
             },
           ),
           const Divider(),

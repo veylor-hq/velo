@@ -8,17 +8,21 @@ import '../domain/fuel_record.dart';
 import '../../../core/settings/currency_provider.dart';
 import '../../../core/settings/haptics_provider.dart';
 
+Future<void> showAddFuelSheet(BuildContext context, WidgetRef ref, String carId, [FuelRecord? record]) {
+  return showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) => _FuelSheet(carId: carId, record: record),
+  ).then((_) => ref.read(fuelRecordsProvider(carId).notifier).refresh());
+}
+
 class FuelTab extends ConsumerWidget {
   final String carId;
 
   const FuelTab({super.key, required this.carId});
 
   void _showAddEditSheet(BuildContext context, WidgetRef ref, [FuelRecord? record]) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => _FuelSheet(carId: carId, record: record),
-    ).then((_) => ref.read(fuelRecordsProvider(carId).notifier).refresh());
+    showAddFuelSheet(context, ref, carId, record);
   }
 
   @override

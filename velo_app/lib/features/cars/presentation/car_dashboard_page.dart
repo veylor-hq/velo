@@ -16,8 +16,9 @@ import '../domain/car.dart';
 
 class CarDashboardPage extends ConsumerStatefulWidget {
   final String carId;
+  final String? initialAction;
 
-  const CarDashboardPage({super.key, required this.carId});
+  const CarDashboardPage({super.key, required this.carId, this.initialAction});
 
   @override
   ConsumerState<CarDashboardPage> createState() => _CarDashboardPageState();
@@ -26,6 +27,7 @@ class CarDashboardPage extends ConsumerStatefulWidget {
 class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with SingleTickerProviderStateMixin {
   TabController? _tabController;
   bool _showRunningTotalOnly = false;
+  bool _hasOpenedInitialAction = false;
 
   @override
   void initState() {
@@ -90,6 +92,14 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
       ),
       body: carAsync.when(
         data: (car) {
+          if (widget.initialAction == 'add_fuel' && !_hasOpenedInitialAction) {
+            _hasOpenedInitialAction = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _tabController?.animateTo(1);
+              showAddFuelSheet(context, ref, car.id);
+            });
+          }
+
           return TabBarView(
             controller: _tabController,
             children: [

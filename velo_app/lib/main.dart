@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart';
 
 import 'router/app_router.dart';
 
@@ -14,11 +15,39 @@ void main() {
   );
 }
 
-class VeloApp extends ConsumerWidget {
+class VeloApp extends ConsumerStatefulWidget {
   const VeloApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<VeloApp> createState() => _VeloAppState();
+}
+
+class _VeloAppState extends ConsumerState<VeloApp> {
+  @override
+  void initState() {
+    super.initState();
+    HomeWidget.widgetClicked.listen(_launchFromWidget);
+    _checkForWidgetLaunch();
+  }
+
+  void _checkForWidgetLaunch() async {
+    final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+    _launchFromWidget(uri);
+  }
+
+  void _launchFromWidget(Uri? uri) {
+    if (uri != null && uri.scheme == 'velo' && uri.host == 'add_fuel') {
+      final carId = uri.queryParameters['carId'];
+      if (carId != null && carId.isNotEmpty) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          ref.read(routerProvider).push('/car/$carId?action=add_fuel');
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(themeModeProvider);
 

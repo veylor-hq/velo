@@ -73,7 +73,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/car/:id',
         builder: (BuildContext context, GoRouterState state) {
           final id = state.pathParameters['id']!;
-          return CarDashboardPage(carId: id);
+          final action = state.uri.queryParameters['action'];
+          return CarDashboardPage(carId: id, initialAction: action);
         },
       ),
       GoRoute(
