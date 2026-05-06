@@ -7,6 +7,7 @@ import '../../cars/providers/cars_provider.dart';
 import '../../fuel/providers/fuel_provider.dart';
 import '../../odometer/providers/odometer_provider.dart';
 import '../../supply/providers/supply_provider.dart';
+import '../../service/providers/service_provider.dart';
 
 part 'auth_provider.g.dart';
 
@@ -53,6 +54,7 @@ class AuthNotifier extends _$AuthNotifier {
     ref.invalidate(fuelRecordsProvider);
     ref.invalidate(odometerRecordsProvider);
     ref.invalidate(supplyRecordsProvider);
+    ref.invalidate(serviceRecordsProvider);
     state = AuthState.unauthenticated;
   }
 }

@@ -23,7 +23,9 @@ from models.models import (
     SupplyRecord,
     User,
     FuelRecord,
-    OdometerRecord
+    OdometerRecord,
+    ServiceSupplyItem,
+    ServiceRecord
 )
 
 if not os.path.exists("static/cars"):
@@ -59,7 +61,8 @@ async def lifespan(app: FastAPI):
             Car,
             FuelRecord,
             SupplyRecord,
-            OdometerRecord
+            OdometerRecord,
+            ServiceRecord
         ],
     )
 

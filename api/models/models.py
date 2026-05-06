@@ -158,3 +158,27 @@ class OdometerRecord(Document):
         "populate_by_name": True,
         "json_encoders": {PydanticObjectId: str}
     }
+
+class ServiceSupplyItem(BaseModel):
+    supply_id: PydanticObjectId
+    name: str
+    quantity: int
+    price_per_unit: float = 0.0
+
+class ServiceRecord(Document):
+    car_id: PydanticObjectId
+    date: datetime
+    odometer: int
+    total_cost: float = 0.0
+    notes: Optional[str] = None
+    supplies_used: list[ServiceSupplyItem] = Field(default_factory=list)
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "service_record"
+        
+    model_config = {
+        "populate_by_name": True,
+        "json_encoders": {PydanticObjectId: str}
+    }
