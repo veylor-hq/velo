@@ -5,8 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/storage/secure_storage.dart';
-import '../../../core/config.dart';
 import '../../../core/settings/haptics_provider.dart';
+import '../../../router/app_router.dart';
 
 class ServerSetupPage extends ConsumerStatefulWidget {
   const ServerSetupPage({super.key});
@@ -29,7 +29,7 @@ class _ServerSetupPageState extends ConsumerState<ServerSetupPage> {
     const storage = SecureStorageService();
     final url = await storage.getServerUrl();
     setState(() {
-      _serverUrlController.text = url ?? AppConfig.baseUrl;
+      _serverUrlController.text = url ?? 'https://api.veylor.dev/velo';
       _isLoading = false;
     });
   }
@@ -47,6 +47,8 @@ class _ServerSetupPageState extends ConsumerState<ServerSetupPage> {
 
     const storage = SecureStorageService();
     await storage.setServerUrl(url);
+    
+    ref.invalidate(serverUrlStateProvider);
     
     if (mounted) {
       context.go('/signin');
