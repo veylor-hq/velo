@@ -85,9 +85,11 @@ async def create_car(
         with Image.open(BytesIO(content)) as img:
             rgb_img = img.convert("RGB")
             rgb_img.save(file_path, "JPEG", quality=20)
-    except Exception:
+    except Exception as e:
         await car.delete()
-        raise HTTPException(status_code=400, detail="Invalid image format")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=f"Invalid image format: {str(e)}")
 
     return {
         "id": str(car.id),
@@ -180,8 +182,10 @@ async def update_car(
             with Image.open(BytesIO(content)) as img:
                 rgb_img = img.convert("RGB")
                 rgb_img.save(file_path, "JPEG", quality=20)
-        except Exception:
-            raise HTTPException(status_code=400, detail="Invalid image format")
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            raise HTTPException(status_code=400, detail=f"Invalid image format: {str(e)}")
 
     car.updated_at = datetime.utcnow()
     await car.save()

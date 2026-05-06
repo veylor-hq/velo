@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../domain/car.dart';
 import '../providers/cars_provider.dart';
 import '../service/car_service.dart';
+import 'package:dio/dio.dart';
 
 class CreateEditCarSheet extends ConsumerStatefulWidget {
   final Car? carToEdit;
@@ -141,6 +142,13 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(widget.carToEdit == null ? 'Car added' : 'Car updated')),
+        );
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        final detail = e.response?.data?['detail'] ?? e.message;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $detail')),
         );
       }
     } catch (e) {
