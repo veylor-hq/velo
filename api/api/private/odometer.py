@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.core.jwt import FastJWT
 from models.models import Car, OdometerRecord
+from api.private.sync import sync_car_odometer
 
 odometer_router = APIRouter(prefix="/odometer")
 
@@ -44,6 +45,9 @@ async def create_odometer_record(
         notes=payload.notes
     )
     await record.insert()
+
+    await sync_car_odometer(car_id, user.id)
+
     return record
 
 
@@ -61,6 +65,7 @@ async def delete_odometer_record(
         raise HTTPException(status_code=404, detail="Odometer record not found")
     
     await record.delete()
+    await sync_car_odometer(car_id, user.id)
     return {"message": "Odometer record deleted"}
 
 class OdometerRecordUpdate(BaseModel):
@@ -87,4 +92,5 @@ async def update_odometer_record(
         setattr(record, key, value)
     
     await record.save()
+    await sync_car_odometer(car_id, user.id)
     return record

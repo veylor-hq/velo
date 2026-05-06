@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.core.jwt import FastJWT
 from models.models import Car, ServiceRecord, ServiceSupplyItem, SupplyRecord, OdometerRecord
+from api.private.sync import sync_car_odometer
 
 service_router = APIRouter(prefix="/service")
 
@@ -73,6 +74,8 @@ async def create_service_record(
         odo = OdometerRecord(car_id=car_id, date=payload.date, odometer=payload.odometer, notes="Auto-inserted from Service")
         await odo.insert()
 
+    await sync_car_odometer(car_id, user.id)
+
     return record
 
 @service_router.delete("/{record_id}")
@@ -96,6 +99,7 @@ async def delete_service_record(
             await supply.save()
 
     await record.delete()
+    await sync_car_odometer(car_id, user.id)
     return {"message": "Service record deleted"}
 
 class ServiceRecordUpdate(BaseModel):
@@ -152,4 +156,5 @@ async def update_service_record(
         setattr(record, key, value)
     
     await record.save()
+    await sync_car_odometer(car_id, user.id)
     return record

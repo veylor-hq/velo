@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from app.core.jwt import FastJWT
 from models.models import Car, FuelRecord
 from api.private.odometer import create_odometer_record, OdometerRecordCreate
+from api.private.sync import sync_car_odometer
 
 UPLOAD_DIR = "static/fuel_records"
 
@@ -72,10 +73,6 @@ async def create_fuel_record(
             await fuel_record.delete()
             raise HTTPException(status_code=400, detail="Invalid image format")
 
-    if fuel_data.odometer > car.current_odometer:
-        car.current_odometer = fuel_data.odometer
-        await car.save()
-
     if fuel_data.insert_odometer_record:
         odometer_record = await create_odometer_record(
             car_id=car_id,
@@ -86,6 +83,8 @@ async def create_fuel_record(
             ),
             user=user
         )
+
+    await sync_car_odometer(car_id, user.id)
 
     return {
         "fuel_record": fuel_record,
@@ -161,6 +160,8 @@ async def update_fuel_record(
         except Exception:
             raise HTTPException(status_code=422, detail="Invalid metadata format")
         
+    await sync_car_odometer(car_id, user.id)
+
     if photo:
         filename = f"{user.id}-{car_id}-{fuel_record.id}.jpg"
         file_path = os.path.join(UPLOAD_DIR, filename)
@@ -193,5 +194,7 @@ async def delete_fuel_record(
     file_path = os.path.join(UPLOAD_DIR, f"{user.id}-{car_id}-{record_id}.jpg")
     if os.path.exists(file_path):
         os.remove(file_path)
+
+    await sync_car_odometer(car_id, user.id)
 
     return {"detail": "Fuel record deleted"}

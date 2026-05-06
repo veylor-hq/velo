@@ -12,7 +12,7 @@ from app.core.config import config
 from app.core.jwt import FastJWT
 from models.models import Car, FuelUnit, OdometerUnit
 from api.private.fuel import fuel_router
-from api.private.odometer import odometer_router
+from api.private.odometer import odometer_router, create_odometer_record, OdometerRecordCreate
 
 UPLOAD_DIR = "static/cars"
 
@@ -71,6 +71,11 @@ async def create_car(
         vin=car_data.vin,
     )
     await car.insert()
+
+    if car_data.initial_odometer > 0:
+        from models.models import OdometerRecord
+        odo = OdometerRecord(car_id=car.id, date=datetime.utcnow(), odometer=car_data.initial_odometer, notes="Initial Odometer")
+        await odo.insert()
 
     filename = f"{user.id}-{car.id}.jpg"
     file_path = os.path.join(UPLOAD_DIR, filename)

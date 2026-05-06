@@ -222,8 +222,9 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
               Expanded(
                 child: TextField(
                   controller: _odometerController,
-                  decoration: const InputDecoration(labelText: 'Current Odometer'),
+                  decoration: InputDecoration(labelText: widget.carToEdit == null ? 'Initial Odometer' : 'Current Odometer'),
                   keyboardType: TextInputType.number,
+                  enabled: widget.carToEdit == null,
                 ),
               ),
               const SizedBox(width: 24),

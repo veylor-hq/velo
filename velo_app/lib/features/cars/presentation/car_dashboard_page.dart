@@ -91,9 +91,15 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
             controller: _tabController,
             children: [
               // Details Tab
-              SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
+              RefreshIndicator(
+                onRefresh: () async {
+                  ref.read(hapticsConfigProvider.notifier).light();
+                  ref.invalidate(currentCarProvider(car.id));
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (car.photoUrl != null)
@@ -125,6 +131,7 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
                     )
                   ],
                 ),
+              ),
               ),
               // Fuel Tab
               FuelTab(carId: car.id),
