@@ -326,6 +326,7 @@ class _FuelSheetState extends ConsumerState<_FuelSheet> {
           ),
           const SizedBox(height: 24),
           TextField(controller: _odometerController, decoration: const InputDecoration(labelText: 'Odometer *'), keyboardType: TextInputType.number),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(child: TextField(controller: _amountController, decoration: const InputDecoration(labelText: 'Amount *'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
@@ -333,7 +334,9 @@ class _FuelSheetState extends ConsumerState<_FuelSheet> {
               Expanded(child: TextField(controller: _costController, decoration: const InputDecoration(labelText: 'Total Cost *'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
             ],
           ),
+          const SizedBox(height: 16),
           TextField(controller: _notesController, decoration: const InputDecoration(labelText: 'Notes')),
+          const SizedBox(height: 16),
           SwitchListTile(
             title: const Text('Is Full Tank?'),
             value: _isFullTank,

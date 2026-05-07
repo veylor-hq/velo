@@ -199,6 +199,7 @@ class _SupplySheetState extends ConsumerState<_SupplySheet> {
           Text(widget.record == null ? 'Add Supply' : 'Edit Supply', style: const TextStyle(fontSize: 20)),
           const SizedBox(height: 24),
           TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Name *')),
+          const SizedBox(height: 16),
           const SizedBox(height: 24),
           Row(
             children: [

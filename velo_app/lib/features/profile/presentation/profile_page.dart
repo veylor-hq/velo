@@ -115,6 +115,7 @@ class _ChangePasswordSheetState extends ConsumerState<_ChangePasswordSheet> {
           const Text('Change Password', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           TextField(controller: _currentController, decoration: const InputDecoration(labelText: 'Current Password'), obscureText: true),
+          const SizedBox(height: 16),
           TextField(controller: _newController, decoration: const InputDecoration(labelText: 'New Password'), obscureText: true),
           const SizedBox(height: 24),
           if (_isLoading) const Center(child: CircularProgressIndicator())

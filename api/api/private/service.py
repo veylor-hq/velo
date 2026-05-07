@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.core.jwt import FastJWT
-from models.models import Car, ServiceRecord, ServiceSupplyItem, SupplyRecord, OdometerRecord
+from models.models import Car, ServiceRecord, ServiceSupplyItem, SupplyRecord, OdometerRecord, ServiceType
 from api.private.sync import sync_car_odometer
 
 service_router = APIRouter(prefix="/service")
@@ -21,6 +21,7 @@ class ServiceRecordCreate(BaseModel):
     odometer: int
     total_cost: float
     notes: Optional[str] = None
+    type: ServiceType = ServiceType.SERVICE
     insert_odometer_record: bool = False
     supplies_used: List[ServiceSupplyItemCreate] = []
 
@@ -66,6 +67,7 @@ async def create_service_record(
         odometer=payload.odometer,
         total_cost=payload.total_cost,
         notes=payload.notes,
+        type=payload.type,
         supplies_used=processed_supplies
     )
     await record.insert()
@@ -107,6 +109,7 @@ class ServiceRecordUpdate(BaseModel):
     odometer: Optional[int] = None
     total_cost: Optional[float] = None
     notes: Optional[str] = None
+    type: Optional[ServiceType] = None
     supplies_used: Optional[List[ServiceSupplyItemCreate]] = None
 
 @service_router.patch("/{record_id}")

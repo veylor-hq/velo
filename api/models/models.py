@@ -165,8 +165,14 @@ class ServiceSupplyItem(BaseModel):
     quantity: int
     price_per_unit: float = 0.0
 
+class ServiceType(str, Enum):
+    SERVICE = "service"
+    REPAIR = "repair"
+    UPGRADE = "upgrade"
+
 class ServiceRecord(Document):
     car_id: PydanticObjectId
+    type: ServiceType = ServiceType.SERVICE
     date: datetime
     odometer: int
     total_cost: float = 0.0

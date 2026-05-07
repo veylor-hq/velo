@@ -30,6 +30,7 @@ class ServiceRecord {
   final String date;
   final int odometer;
   final double totalCost;
+  final String type;
   final String? notes;
   final List<ServiceSupplyItem> suppliesUsed;
 
@@ -39,6 +40,7 @@ class ServiceRecord {
     required this.date,
     required this.odometer,
     required this.totalCost,
+    this.type = 'service',
     this.notes,
     required this.suppliesUsed,
   });
@@ -50,6 +52,7 @@ class ServiceRecord {
       date: json['date'] as String,
       odometer: json['odometer'] as int,
       totalCost: (json['total_cost'] as num?)?.toDouble() ?? 0.0,
+      type: json['type'] as String? ?? 'service',
       notes: json['notes'] as String?,
       suppliesUsed: (json['supplies_used'] as List?)?.map((e) => ServiceSupplyItem.fromJson(e as Map<String, dynamic>)).toList() ?? [],
     );

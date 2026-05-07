@@ -207,6 +207,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
             controller: _plateController,
             decoration: const InputDecoration(labelText: 'License Plate *'),
           ),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(child: TextField(controller: _makeController, decoration: const InputDecoration(labelText: 'Make'))),
@@ -214,6 +215,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
               Expanded(child: TextField(controller: _modelController, decoration: const InputDecoration(labelText: 'Model'))),
             ],
           ),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(child: TextField(controller: _yearController, decoration: const InputDecoration(labelText: 'Year'), keyboardType: TextInputType.number)),
@@ -221,10 +223,12 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
               Expanded(child: TextField(controller: _colorController, decoration: const InputDecoration(labelText: 'Color'))),
             ],
           ),
+          const SizedBox(height: 16),
           TextField(
             controller: _vinController,
             decoration: const InputDecoration(labelText: 'VIN'),
           ),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -285,6 +289,7 @@ class _CreateEditCarSheetState extends ConsumerState<CreateEditCarSheet> {
               Expanded(child: TextField(controller: _priceBoughtController, decoration: const InputDecoration(labelText: 'Price Bought'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
             ],
           ),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(

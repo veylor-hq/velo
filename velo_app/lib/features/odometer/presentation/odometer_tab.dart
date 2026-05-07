@@ -224,6 +224,7 @@ class _OdometerSheetState extends ConsumerState<_OdometerSheet> {
           ),
           const SizedBox(height: 24),
           TextField(controller: _odometerController, decoration: const InputDecoration(labelText: 'Odometer'), keyboardType: TextInputType.number),
+          const SizedBox(height: 16),
           TextField(controller: _notesController, decoration: const InputDecoration(labelText: 'Notes')),
           const SizedBox(height: 24),
           if (_isLoading) const Center(child: CircularProgressIndicator())

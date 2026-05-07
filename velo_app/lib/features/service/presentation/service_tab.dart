@@ -11,36 +11,70 @@ import '../../supply/domain/supply_record.dart';
 import '../../../core/settings/currency_provider.dart';
 import '../../../core/settings/haptics_provider.dart';
 
-class ServiceTab extends ConsumerWidget {
+class ServiceTab extends ConsumerStatefulWidget {
   final String carId;
 
   const ServiceTab({super.key, required this.carId});
+
+  @override
+  ConsumerState<ServiceTab> createState() => _ServiceTabState();
+}
+
+class _ServiceTabState extends ConsumerState<ServiceTab> {
+  String _selectedFilter = 'all';
 
   void _showAddEditSheet(BuildContext context, WidgetRef ref, [ServiceRecord? record]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (ctx) => _ServiceSheet(carId: carId, record: record),
-    ).then((_) => ref.read(serviceRecordsProvider(carId).notifier).refresh());
+      builder: (ctx) => _ServiceSheet(carId: widget.carId, record: record),
+    ).then((_) => ref.read(serviceRecordsProvider(widget.carId).notifier).refresh());
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncRecords = ref.watch(serviceRecordsProvider(carId));
+  Widget build(BuildContext context) {
+    final asyncRecords = ref.watch(serviceRecordsProvider(widget.carId));
     final currency = ref.watch(currencyProvider);
 
     return Scaffold(
       body: asyncRecords.when(
-        data: (records) {
-          if (records.isEmpty) return const Center(child: Text('No service records.'));
+        data: (allRecords) {
+          final records = _selectedFilter == 'all' 
+              ? allRecords 
+              : allRecords.where((r) => r.type == _selectedFilter).toList();
+
           return RefreshIndicator(
-            onRefresh: () => ref.read(serviceRecordsProvider(carId).notifier).refresh(),
+            onRefresh: () => ref.read(serviceRecordsProvider(widget.carId).notifier).refresh(),
             child: ListView.builder(
-              itemCount: records.length + 1,
+              itemCount: records.length + 2,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  if (records.isEmpty) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+                    child: SegmentedButton<String>(
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                          const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        ),
+                      ),
+                      showSelectedIcon: false,
+                      segments: const [
+                        ButtonSegment(value: 'all', label: Text('All')),
+                        ButtonSegment(value: 'service', label: Text('Service')),
+                        ButtonSegment(value: 'repair', label: Text('Repair')),
+                        ButtonSegment(value: 'upgrade', label: Text('Upgrade')),
+                      ],
+                      selected: {_selectedFilter},
+                      onSelectionChanged: (selection) {
+                        setState(() => _selectedFilter = selection.first);
+                      },
+                    ),
+                  );
+                }
+
+                if (index == 1) {
+                  if (records.isEmpty) return const Center(child: Padding(padding: EdgeInsets.all(32), child: Text('No records found.')));
                   double totalSpend = 0;
                   int totalServices = records.length;
                   
@@ -89,7 +123,7 @@ class ServiceTab extends ConsumerWidget {
                   );
                 }
 
-                final recordIndex = index - 1;
+                final recordIndex = index - 2;
                 final r = records[recordIndex];
                 final isFirst = recordIndex == 0;
                 final isLast = recordIndex == records.length - 1;
@@ -136,7 +170,7 @@ class ServiceTab extends ConsumerWidget {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('LOG // ${r.date.split("T").first}', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                                    Text('${r.type.toUpperCase()} // ${r.date.split("T").first}', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                                     Text('ODO: ${r.odometer}', style: const TextStyle(fontWeight: FontWeight.w600)),
                                   ],
                                 ),
@@ -225,6 +259,7 @@ class _ServiceSheetState extends ConsumerState<_ServiceSheet> {
   final _costController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime? _selectedDate;
+  String _type = 'service';
   bool _insertOdometer = true;
   bool _isLoading = false;
 
@@ -236,6 +271,7 @@ class _ServiceSheetState extends ConsumerState<_ServiceSheet> {
     if (widget.record != null) {
       _odometerController.text = widget.record!.odometer.toString();
       _costController.text = widget.record!.totalCost.toString();
+      _type = widget.record!.type;
       _notesController.text = widget.record!.notes ?? '';
       _selectedSupplies = List.from(widget.record!.suppliesUsed);
     }
@@ -285,6 +321,7 @@ class _ServiceSheetState extends ConsumerState<_ServiceSheet> {
         'date': _selectedDate != null ? _selectedDate!.toUtc().toIso8601String() : widget.record?.date ?? DateTime.now().toUtc().toIso8601String(),
         'odometer': int.tryParse(_odometerController.text) ?? 0,
         'total_cost': double.tryParse(_costController.text) ?? 0.0,
+        'type': _type,
         if (_notesController.text.isNotEmpty) 'notes': _notesController.text.trim(),
         'supplies_used': _selectedSupplies.map((e) => e.toJson()).toList(),
         if (widget.record == null) 'insert_odometer_record': _insertOdometer,
@@ -340,6 +377,24 @@ class _ServiceSheetState extends ConsumerState<_ServiceSheet> {
                 }
               },
             ),
+            const SizedBox(height: 16),
+            SegmentedButton<String>(
+              style: ButtonStyle(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                ),
+              ),
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: 'service', label: Text('Service')),
+                ButtonSegment(value: 'repair', label: Text('Repair')),
+                ButtonSegment(value: 'upgrade', label: Text('Upgrade')),
+              ],
+              selected: {_type},
+              onSelectionChanged: (Set<String> newSelection) {
+                setState(() => _type = newSelection.first);
+              },
+            ),
             const SizedBox(height: 24),
             Row(
               children: [
@@ -348,6 +403,7 @@ class _ServiceSheetState extends ConsumerState<_ServiceSheet> {
                 Expanded(child: TextField(controller: _costController, decoration: const InputDecoration(labelText: 'Total Cost *'), keyboardType: const TextInputType.numberWithOptions(decimal: true))),
               ],
             ),
+            const SizedBox(height: 16),
             TextField(controller: _notesController, decoration: const InputDecoration(labelText: 'Notes')),
             const SizedBox(height: 24),
             const Text('PARTS USED:', style: TextStyle(fontWeight: FontWeight.bold)),
