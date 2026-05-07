@@ -10,6 +10,8 @@ class FuelRecord {
   final bool skipMpgCalculation;
   final String? notes;
   final int? deltaMileage;
+  final double? mpgUk;
+  final double? lPer100Km;
 
   FuelRecord({
     required this.id,
@@ -23,6 +25,8 @@ class FuelRecord {
     required this.skipMpgCalculation,
     this.notes,
     this.deltaMileage,
+    this.mpgUk,
+    this.lPer100Km,
   });
 
   factory FuelRecord.fromJson(Map<String, dynamic> json) {
@@ -38,6 +42,8 @@ class FuelRecord {
       skipMpgCalculation: json['skip_mpg_calculation'] as bool,
       notes: json['notes'] as String?,
       deltaMileage: json['delta_mileage'] as int?,
+      mpgUk: (json['mpg_uk'] as num?)?.toDouble(),
+      lPer100Km: (json['l_per_100km'] as num?)?.toDouble(),
     );
   }
 }

@@ -125,6 +125,23 @@ async def get_fuel_records(
             valid_distance += delta_mileage
             valid_fuel += record.fuel_amount
 
+        rec_dist_km = delta_mileage if car.odometer_unit == OdometerUnit.KILOMETERS else delta_mileage * 1.60934
+        rec_dist_mi = delta_mileage if car.odometer_unit == OdometerUnit.MILES else delta_mileage * 0.621371
+
+        if car.fuel_unit == FuelUnit.LITERS:
+            rec_fuel_l = record.fuel_amount
+            rec_fuel_uk_gal = record.fuel_amount * 0.219969
+        else:
+            rec_fuel_uk_gal = record.fuel_amount
+            rec_fuel_l = record.fuel_amount * 4.54609
+
+        if record.is_full_tank and not record.skip_mpg_calculation and delta_mileage > 0 and record.fuel_amount > 0:
+            record_dict["mpg_uk"] = round(rec_dist_mi / rec_fuel_uk_gal, 1) if rec_fuel_uk_gal > 0 else None
+            record_dict["l_per_100km"] = round(rec_fuel_l / (rec_dist_km / 100), 1) if rec_dist_km > 0 else None
+        else:
+            record_dict["mpg_uk"] = None
+            record_dict["l_per_100km"] = None
+
         result.append(record_dict)
 
     result.reverse()
