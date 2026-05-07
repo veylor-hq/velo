@@ -179,7 +179,7 @@ class FuelTab extends ConsumerWidget {
                               if (r.mpgUk != null && r.lPer100Km != null)
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                                  child: Text('MPG: ${r.mpgUk!.toStringAsFixed(1)} ( ${r.lPer100Km!.toStringAsFixed(1)} l/100km )', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+                                  child: Text('MPG: ${r.mpgUk!.toStringAsFixed(1)} ( ${r.lPer100Km!.toStringAsFixed(1)} l/100km )', style: const TextStyle(fontWeight: FontWeight.bold)),
                                 ),
                               if (r.notes != null && r.notes!.isNotEmpty)
                                 Padding(
