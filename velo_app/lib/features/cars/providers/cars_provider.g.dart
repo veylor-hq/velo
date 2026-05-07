@@ -120,3 +120,42 @@ final class CurrentCarFamily extends $Family
   @override
   String toString() => r'currentCarProvider';
 }
+
+@ProviderFor(garageStats)
+final garageStatsProvider = GarageStatsProvider._();
+
+final class GarageStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<GarageStats>,
+          GarageStats,
+          FutureOr<GarageStats>
+        >
+    with $FutureModifier<GarageStats>, $FutureProvider<GarageStats> {
+  GarageStatsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'garageStatsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$garageStatsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<GarageStats> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<GarageStats> create(Ref ref) {
+    return garageStats(ref);
+  }
+}
+
+String _$garageStatsHash() => r'a9f29c0bbebea01b5efddbd111bd1f2e6bceddca';

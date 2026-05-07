@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/dio_client.dart';
 import '../domain/car.dart';
+import '../domain/garage_stats.dart';
 
 part 'car_service.g.dart';
 
@@ -11,6 +12,11 @@ class CarService {
   final Dio _dio;
 
   CarService(this._dio);
+
+  Future<GarageStats> getGarageStats() async {
+    final response = await _dio.get('/api/private/car/stats/overall');
+    return GarageStats.fromJson(response.data as Map<String, dynamic>);
+  }
 
   Future<List<Car>> getCars() async {
     final response = await _dio.get('/api/private/car/');

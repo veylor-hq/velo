@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from app.core.config import config
 from app.core.jwt import FastJWT
-from models.models import Car, FuelUnit, OdometerUnit
+from models.models import Car, FuelUnit, OdometerUnit, FuelRecord, ServiceRecord, ExpenseRecord, OdometerRecord
 from api.private.fuel import fuel_router
 from api.private.odometer import odometer_router, create_odometer_record, OdometerRecordCreate
 
@@ -113,6 +113,64 @@ async def get_cars(user=Depends(FastJWT().login_required)):
         "base_url": f"{config.API_BASE_URL}/api/static/cars/",
     }
 
+
+@car_router.get("/stats/overall")
+async def get_garage_stats(user=Depends(FastJWT().login_required)):
+    cars = await Car.find(Car.user_id == user.id).to_list()
+    
+    total_spent = 0.0
+    
+    total_distance_by_unit = {
+        OdometerUnit.KILOMETERS: 0.0,
+        OdometerUnit.MILES: 0.0,
+    }
+    
+    total_fuel_amount_by_unit = {
+        FuelUnit.LITERS: 0.0,
+        FuelUnit.GALLONS: 0.0,
+    }
+    
+    total_spent = 0.0
+    total_fuel_cost = 0.0
+    total_services = 0.0
+    total_expenses = 0.0
+
+    for car in cars:
+        odo_records = await OdometerRecord.find(OdometerRecord.car_id == car.id).sort(+OdometerRecord.date).to_list()
+        if odo_records:
+            min_odo = odo_records[0].odometer
+            max_odo = car.current_odometer or odo_records[-1].odometer
+            if max_odo > min_odo:
+                total_distance_by_unit[car.odometer_unit] += (max_odo - min_odo)
+                
+        fuel_records = await FuelRecord.find(FuelRecord.car_id == car.id).to_list()
+        for r in fuel_records:
+            total_fuel_cost += r.total_cost
+            total_spent += r.total_cost
+            total_fuel_amount_by_unit[car.fuel_unit] += r.fuel_amount
+            
+        service_records = await ServiceRecord.find(ServiceRecord.car_id == car.id).to_list()
+        for r in service_records:
+            total_spent += r.total_cost
+            total_services += r.total_cost
+            for s in r.supplies_used:
+                part_cost = s.price_per_unit * s.quantity
+                total_spent += part_cost
+                total_services += part_cost
+                
+        expense_records = await ExpenseRecord.find(ExpenseRecord.car_id == car.id).to_list()
+        for r in expense_records:
+            total_spent += r.amount
+            total_expenses += r.amount
+
+    return {
+        "total_spent": total_spent,
+        "total_fuel_cost": total_fuel_cost,
+        "total_services": total_services,
+        "total_expenses": total_expenses,
+        "distance_by_unit": total_distance_by_unit,
+        "fuel_amount_by_unit": total_fuel_amount_by_unit,
+    }
 
 @car_router.get("/{car_id}")
 async def get_car(car_id: PydanticObjectId, user=Depends(FastJWT().login_required)):

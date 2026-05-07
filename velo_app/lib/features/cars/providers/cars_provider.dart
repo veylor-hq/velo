@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/car.dart';
+import '../domain/garage_stats.dart';
 import '../service/car_service.dart';
 
 part 'cars_provider.g.dart';
@@ -21,4 +22,9 @@ class Cars extends _$Cars {
 @riverpod
 Future<Car> currentCar(Ref ref, String id) {
   return ref.watch(carServiceProvider).getCar(id);
+}
+
+@riverpod
+Future<GarageStats> garageStats(Ref ref) {
+  return ref.watch(carServiceProvider).getGarageStats();
 }

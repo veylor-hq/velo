@@ -325,8 +325,7 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
               children: [
                 _buildDetailItem('CAR', '$currency${carCost.toStringAsFixed(0)}'),
                 _buildDetailItem('FUEL', '$currency${fuelTotal.toStringAsFixed(0)}'),
-                _buildDetailItem('LABOUR', '$currency${serviceLaborTotal.toStringAsFixed(0)}'),
-                _buildDetailItem('PARTS', '$currency${servicePartsTotal.toStringAsFixed(0)}'),
+                _buildDetailItem('SERVICES', '$currency${(serviceLaborTotal + servicePartsTotal).toStringAsFixed(0)}'),
                 _buildDetailItem('FEES', '$currency${expenseTotal.toStringAsFixed(0)}'),
               ],
             )
