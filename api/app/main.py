@@ -25,7 +25,8 @@ from models.models import (
     FuelRecord,
     OdometerRecord,
     ServiceSupplyItem,
-    ServiceRecord
+    ServiceRecord,
+    ExpenseRecord
 )
 
 if not os.path.exists("static/cars"):
@@ -33,6 +34,9 @@ if not os.path.exists("static/cars"):
 
 if not os.path.exists("static/fuel_records"):
     os.makedirs("static/fuel_records")
+
+if not os.path.exists("static/expenses"):
+    os.makedirs("static/expenses")
 
 
 def init_sentry() -> None:
@@ -62,7 +66,8 @@ async def lifespan(app: FastAPI):
             FuelRecord,
             SupplyRecord,
             OdometerRecord,
-            ServiceRecord
+            ServiceRecord,
+            ExpenseRecord
         ],
     )
 

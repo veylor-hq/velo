@@ -188,3 +188,29 @@ class ServiceRecord(Document):
         "populate_by_name": True,
         "json_encoders": {PydanticObjectId: str}
     }
+
+class ExpenseType(str, Enum):
+    INSURANCE = "insurance"
+    TAX = "tax"
+    FINE = "fine"
+    TOLL = "toll"
+    PARKING = "parking"
+    OTHER = "other"
+
+class ExpenseRecord(Document):
+    car_id: PydanticObjectId
+    date: datetime
+    amount: float
+    type: ExpenseType = ExpenseType.OTHER
+    notes: Optional[str] = None
+    has_photo: bool = False
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "expense_record"
+        
+    model_config = {
+        "populate_by_name": True,
+        "json_encoders": {PydanticObjectId: str}
+    }

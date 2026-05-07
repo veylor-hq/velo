@@ -7,11 +7,13 @@ import '../../cars/presentation/create_edit_car_sheet.dart';
 import '../../fuel/presentation/fuel_tab.dart';
 import '../../odometer/presentation/odometer_tab.dart';
 import '../../service/presentation/service_tab.dart';
+import '../../expense/presentation/expense_tab.dart';
 import '../../../core/settings/haptics_provider.dart';
 import '../../../core/settings/default_tab_provider.dart';
 import '../../../core/settings/currency_provider.dart';
 import '../../fuel/providers/fuel_provider.dart';
 import '../../service/providers/service_provider.dart';
+import '../../expense/providers/expense_provider.dart';
 import '../domain/car.dart';
 
 class CarDashboardPage extends ConsumerStatefulWidget {
@@ -72,8 +74,8 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
 
     return defaultTabAsync.when(
       data: (defaultTab) {
-        final safeIndex = defaultTab >= 4 ? 1 : defaultTab;
-        _tabController ??= TabController(length: 4, vsync: this, initialIndex: safeIndex);
+        final safeIndex = defaultTab >= 5 ? 1 : defaultTab;
+        _tabController ??= TabController(length: 5, vsync: this, initialIndex: safeIndex);
         final carAsync = ref.watch(currentCarProvider(widget.carId));
 
         return Scaffold(
@@ -81,12 +83,15 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
             title: const Text('Car Details'),
             bottom: TabBar(
               controller: _tabController,
-          onTap: (index) => ref.read(hapticsConfigProvider.notifier).light(),
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              onTap: (index) => ref.read(hapticsConfigProvider.notifier).light(),
           tabs: const [
             Tab(text: 'Details'),
             Tab(text: 'Fuel'),
             Tab(text: 'Odometer'),
             Tab(text: 'Service'),
+            Tab(text: 'Expenses'),
           ],
         ),
       ),
@@ -198,6 +203,8 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
               OdometerTab(carId: car.id),
               // Service Tab
               ServiceTab(carId: car.id),
+              // Expenses Tab
+              ExpenseTab(carId: car.id),
             ],
           );
         },
@@ -280,8 +287,16 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
       }
     }
 
+    double expenseTotal = 0;
+    final expenseAsync = ref.watch(expenseRecordsProvider(car.id));
+    if (expenseAsync.hasValue) {
+      for (var r in expenseAsync.value!) {
+        expenseTotal += r.amount;
+      }
+    }
+
     final carCost = car.salesMeta?.priceBought ?? 0.0;
-    final runningCosts = fuelTotal + serviceLaborTotal + servicePartsTotal;
+    final runningCosts = fuelTotal + serviceLaborTotal + servicePartsTotal + expenseTotal;
     final grandTotal = carCost + runningCosts;
 
     return GestureDetector(
@@ -303,13 +318,16 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
             const SizedBox(height: 16),
             Text('$currency${(_showRunningTotalOnly ? runningCosts : grandTotal).toStringAsFixed(0)}', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            Wrap(
+              alignment: WrapAlignment.spaceAround,
+              spacing: 16,
+              runSpacing: 16,
               children: [
                 _buildDetailItem('CAR', '$currency${carCost.toStringAsFixed(0)}'),
                 _buildDetailItem('FUEL', '$currency${fuelTotal.toStringAsFixed(0)}'),
                 _buildDetailItem('LABOUR', '$currency${serviceLaborTotal.toStringAsFixed(0)}'),
                 _buildDetailItem('PARTS', '$currency${servicePartsTotal.toStringAsFixed(0)}'),
+                _buildDetailItem('FEES', '$currency${expenseTotal.toStringAsFixed(0)}'),
               ],
             )
           ],

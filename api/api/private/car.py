@@ -5,7 +5,7 @@ from typing import Optional
 
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from PIL import Image
+from PIL import Image, ImageOps
 from pydantic import BaseModel
 
 from app.core.config import config
@@ -83,6 +83,7 @@ async def create_car(
     try:
         content = await photo.read()
         with Image.open(BytesIO(content)) as img:
+            img = ImageOps.exif_transpose(img)
             rgb_img = img.convert("RGB")
             rgb_img.save(file_path, "JPEG", quality=20)
     except Exception as e:
@@ -180,6 +181,7 @@ async def update_car(
         try:
             content = await photo.read()
             with Image.open(BytesIO(content)) as img:
+                img = ImageOps.exif_transpose(img)
                 rgb_img = img.convert("RGB")
                 rgb_img.save(file_path, "JPEG", quality=20)
         except Exception as e:
