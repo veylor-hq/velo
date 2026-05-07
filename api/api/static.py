@@ -4,6 +4,10 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+for d in ["static/cars", "static/fuel_records", "static/expenses"]:
+    if not os.path.exists(d):
+        os.makedirs(d)
+
 static_router = APIRouter(prefix="/static", tags=["static"])
 
 static_router.mount("/cars", StaticFiles(directory="static/cars"), name="cars")
