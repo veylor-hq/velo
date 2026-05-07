@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/fuel_record.dart';
+import '../domain/fuel_data.dart';
 import '../service/fuel_service.dart';
 
 part 'fuel_provider.g.dart';
@@ -8,7 +9,7 @@ part 'fuel_provider.g.dart';
 @Riverpod(keepAlive: true)
 class FuelRecords extends _$FuelRecords {
   @override
-  FutureOr<List<FuelRecord>> build(String carId) async {
+  FutureOr<FuelData> build(String carId) async {
     return ref.watch(fuelServiceProvider).getFuelRecords(carId);
   }
 

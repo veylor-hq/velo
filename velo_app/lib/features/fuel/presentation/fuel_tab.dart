@@ -32,7 +32,8 @@ class FuelTab extends ConsumerWidget {
 
     return Scaffold(
       body: asyncRecords.when(
-        data: (records) {
+        data: (fuelData) {
+          final records = fuelData.records;
           if (records.isEmpty) return const Center(child: Text('No fuel records.'));
           return RefreshIndicator(
             onRefresh: () => ref.read(fuelRecordsProvider(carId).notifier).refresh(),
@@ -41,21 +42,8 @@ class FuelTab extends ConsumerWidget {
               itemBuilder: (context, index) {
                 if (index == 0) {
                   if (records.isEmpty) return const SizedBox.shrink();
-                  double totalSpend = 0;
-                  double totalFuel = 0;
-                  double validDistance = 0;
-                  double validFuel = 0;
-
-                  for (var r in records) {
-                    totalSpend += r.totalCost;
-                    totalFuel += r.fuelAmount;
-                    if (!r.skipMpgCalculation && r.deltaMileage != null && r.fuelAmount > 0) {
-                      validDistance += r.deltaMileage!;
-                      validFuel += r.fuelAmount;
-                    }
-                  }
-
-                  final avgMpg = validFuel > 0 ? (validDistance / validFuel) : 0.0;
+                  
+                  final avgStr = '${fuelData.avgMpgUk.toStringAsFixed(1)} ( ${fuelData.avgLPer100Km.toStringAsFixed(1)} l/100km )';
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 24, right: 16, left: 16, top: 16),
@@ -76,7 +64,7 @@ class FuelTab extends ConsumerWidget {
                               children: [
                                 const Text('SPEND', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
                                 const SizedBox(height: 4),
-                                Text('$currency${totalSpend.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text('$currency${fuelData.totalSpend.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             Column(
@@ -84,7 +72,7 @@ class FuelTab extends ConsumerWidget {
                               children: [
                                 const Text('CONSUMED', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
                                 const SizedBox(height: 4),
-                                Text(totalFuel.toStringAsFixed(1), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text(fuelData.totalFuel.toStringAsFixed(1), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             Column(
@@ -92,7 +80,7 @@ class FuelTab extends ConsumerWidget {
                               children: [
                                 const Text('AVG MPG', style: TextStyle(color: Colors.grey, fontSize: 10, letterSpacing: 1)),
                                 const SizedBox(height: 4),
-                                Text(avgMpg.toStringAsFixed(1), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text(avgStr, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ],

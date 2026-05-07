@@ -9,7 +9,7 @@ from PIL import Image
 from pydantic import BaseModel
 
 from app.core.jwt import FastJWT
-from models.models import Car, FuelRecord
+from models.models import Car, FuelRecord, OdometerUnit, FuelUnit
 from api.private.odometer import create_odometer_record, OdometerRecordCreate
 from api.private.sync import sync_car_odometer
 
@@ -97,30 +97,58 @@ async def get_fuel_records(
     car_id: PydanticObjectId,
     user=Depends(FastJWT().login_required),
 ):
+    car = await Car.find_one(Car.id == car_id)
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+
     fuel_records = await FuelRecord.find(FuelRecord.car_id == car_id).to_list()
 
     sorted_records = sorted(fuel_records, key=lambda r: r.odometer)
     
     result = []
     previous_odometer = None
-    
+    valid_distance = 0.0
+    valid_fuel = 0.0
+
     for record in sorted_records:
         record_dict = record.model_dump(exclude={"id", "_id", "car_id"}, by_alias=True)
         
         record_dict["id"] = str(record.id)
         record_dict["car_id"] = str(record.car_id)
         
-        if previous_odometer is not None:
-            record_dict["delta_mileage"] = record.odometer - previous_odometer
-        else:
-            record_dict["delta_mileage"] = 0
+        delta_mileage = record.odometer - previous_odometer if previous_odometer is not None else 0
+        record_dict["delta_mileage"] = delta_mileage
             
         previous_odometer = record.odometer
+
+        if record.is_full_tank and not record.skip_mpg_calculation and delta_mileage > 0 and record.fuel_amount > 0:
+            valid_distance += delta_mileage
+            valid_fuel += record.fuel_amount
+
         result.append(record_dict)
 
     result.reverse()
 
-    return result
+    dist_km = valid_distance if car.odometer_unit == OdometerUnit.KILOMETERS else valid_distance * 1.60934
+    dist_mi = valid_distance if car.odometer_unit == OdometerUnit.MILES else valid_distance * 0.621371
+
+    if car.fuel_unit == FuelUnit.LITERS:
+        fuel_l = valid_fuel
+        fuel_uk_gal = valid_fuel * 0.219969
+    else:
+        fuel_uk_gal = valid_fuel
+        fuel_l = valid_fuel * 4.54609
+
+    avg_mpg_uk = (dist_mi / fuel_uk_gal) if fuel_uk_gal > 0 else 0.0
+    avg_l_per_100km = (fuel_l / (dist_km / 100)) if dist_km > 0 else 0.0
+
+    return {
+        "records": result,
+        "avg_mpg_uk": avg_mpg_uk,
+        "avg_l_per_100km": avg_l_per_100km,
+        "total_spend": sum(r.total_cost for r in fuel_records),
+        "total_fuel": sum(r.fuel_amount for r in fuel_records)
+    }
 
 class UpdateFuelRecord(BaseModel):
     date: Optional[datetime] = None

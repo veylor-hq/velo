@@ -13,7 +13,7 @@ part of 'fuel_provider.dart';
 final fuelRecordsProvider = FuelRecordsFamily._();
 
 final class FuelRecordsProvider
-    extends $AsyncNotifierProvider<FuelRecords, List<FuelRecord>> {
+    extends $AsyncNotifierProvider<FuelRecords, FuelData> {
   FuelRecordsProvider._({
     required FuelRecordsFamily super.from,
     required String super.argument,
@@ -50,15 +50,15 @@ final class FuelRecordsProvider
   }
 }
 
-String _$fuelRecordsHash() => r'a7e1c8f17cb1fa3d1bb6ccb0e2d8e88dbb042db7';
+String _$fuelRecordsHash() => r'75f528d8652aca652a378eaaea9711bafa5c8d02';
 
 final class FuelRecordsFamily extends $Family
     with
         $ClassFamilyOverride<
           FuelRecords,
-          AsyncValue<List<FuelRecord>>,
-          List<FuelRecord>,
-          FutureOr<List<FuelRecord>>,
+          AsyncValue<FuelData>,
+          FuelData,
+          FutureOr<FuelData>,
           String
         > {
   FuelRecordsFamily._()
@@ -77,21 +77,20 @@ final class FuelRecordsFamily extends $Family
   String toString() => r'fuelRecordsProvider';
 }
 
-abstract class _$FuelRecords extends $AsyncNotifier<List<FuelRecord>> {
+abstract class _$FuelRecords extends $AsyncNotifier<FuelData> {
   late final _$args = ref.$arg as String;
   String get carId => _$args;
 
-  FutureOr<List<FuelRecord>> build(String carId);
+  FutureOr<FuelData> build(String carId);
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref =
-        this.ref as $Ref<AsyncValue<List<FuelRecord>>, List<FuelRecord>>;
+    final ref = this.ref as $Ref<AsyncValue<FuelData>, FuelData>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<FuelRecord>>, List<FuelRecord>>,
-              AsyncValue<List<FuelRecord>>,
+              AnyNotifier<AsyncValue<FuelData>, FuelData>,
+              AsyncValue<FuelData>,
               Object?,
               Object?
             >;

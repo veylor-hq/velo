@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/dio_client.dart';
 import '../domain/fuel_record.dart';
+import '../domain/fuel_data.dart';
 
 part 'fuel_service.g.dart';
 
@@ -11,10 +12,9 @@ class FuelService {
   final Dio _dio;
   FuelService(this._dio);
 
-  Future<List<FuelRecord>> getFuelRecords(String carId) async {
+  Future<FuelData> getFuelRecords(String carId) async {
     final response = await _dio.get('/api/private/car/$carId/fuel/');
-    final list = response.data as List;
-    return list.map((e) => FuelRecord.fromJson(e as Map<String, dynamic>)).toList();
+    return FuelData.fromJson(response.data as Map<String, dynamic>);
   }
 
   Future<FuelRecord> createFuelRecord({

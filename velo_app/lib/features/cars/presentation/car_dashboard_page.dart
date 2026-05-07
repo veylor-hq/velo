@@ -270,7 +270,7 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
     double fuelTotal = 0;
     final fuelAsync = ref.watch(fuelRecordsProvider(car.id));
     if (fuelAsync.hasValue) {
-      for (var r in fuelAsync.value!) {
+      for (var r in fuelAsync.value!.records) {
         fuelTotal += r.totalCost;
       }
     }
@@ -337,9 +337,9 @@ class _CarDashboardPageState extends ConsumerState<CarDashboardPage> with Single
 
   Widget _buildCharts(BuildContext context, Car car) {
     final fuelAsync = ref.watch(fuelRecordsProvider(car.id));
-    if (!fuelAsync.hasValue || fuelAsync.value!.isEmpty) return const SizedBox.shrink();
+    if (!fuelAsync.hasValue || fuelAsync.value!.records.isEmpty) return const SizedBox.shrink();
 
-    final records = fuelAsync.value!.take(10).toList().reversed.toList();
+    final records = fuelAsync.value!.records.take(10).toList().reversed.toList();
     final fuelAmounts = records.map((r) => r.fuelAmount).toList();
     final mileages = records.map((r) => (r.deltaMileage ?? 0).toDouble()).toList();
     final dates = records.map((r) {
